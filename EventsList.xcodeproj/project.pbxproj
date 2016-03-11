@@ -15,6 +15,10 @@
 		54F4ED421C86C9C20031A9BB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 54F4ED401C86C9C20031A9BB /* LaunchScreen.storyboard */; };
 		54F4ED4D1C86C9C20031A9BB /* EventsListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED4C1C86C9C20031A9BB /* EventsListTests.swift */; };
 		54F4ED581C86C9C20031A9BB /* EventsListUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED571C86C9C20031A9BB /* EventsListUITests.swift */; };
+		54F4ED661C86CA890031A9BB /* MainIPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 54F4ED651C86CA890031A9BB /* MainIPad.storyboard */; };
+		54F4ED681C86CBFC0031A9BB /* MainIPhoneCVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED671C86CBFC0031A9BB /* MainIPhoneCVC.swift */; };
+		54F4ED6A1C86CCF20031A9BB /* EventModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED691C86CCF20031A9BB /* EventModel.swift */; };
+		54F4ED6C1C86CD5E0031A9BB /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED6B1C86CD5E0031A9BB /* DataSource.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +53,10 @@
 		54F4ED531C86C9C20031A9BB /* EventsListUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EventsListUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		54F4ED571C86C9C20031A9BB /* EventsListUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsListUITests.swift; sourceTree = "<group>"; };
 		54F4ED591C86C9C20031A9BB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		54F4ED651C86CA890031A9BB /* MainIPad.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainIPad.storyboard; sourceTree = "<group>"; };
+		54F4ED671C86CBFC0031A9BB /* MainIPhoneCVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainIPhoneCVC.swift; sourceTree = "<group>"; };
+		54F4ED691C86CCF20031A9BB /* EventModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventModel.swift; sourceTree = "<group>"; };
+		54F4ED6B1C86CD5E0031A9BB /* DataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,10 +110,14 @@
 				54F4ED341C86C9C20031A9BB /* AppDelegate.swift */,
 				54F4ED361C86C9C20031A9BB /* ViewController.swift */,
 				54F4ED381C86C9C20031A9BB /* Main.storyboard */,
-				54F4ED3E1C86C9C20031A9BB /* Assets.xcassets */,
+				54F4ED671C86CBFC0031A9BB /* MainIPhoneCVC.swift */,
+				54F4ED651C86CA890031A9BB /* MainIPad.storyboard */,
 				54F4ED401C86C9C20031A9BB /* LaunchScreen.storyboard */,
+				54F4ED3E1C86C9C20031A9BB /* Assets.xcassets */,
 				54F4ED431C86C9C20031A9BB /* Info.plist */,
 				54F4ED3B1C86C9C20031A9BB /* EventsList.xcdatamodeld */,
+				54F4ED691C86CCF20031A9BB /* EventModel.swift */,
+				54F4ED6B1C86CD5E0031A9BB /* DataSource.swift */,
 			);
 			path = EventsList;
 			sourceTree = "<group>";
@@ -196,6 +208,7 @@
 				TargetAttributes = {
 					54F4ED301C86C9C10031A9BB = {
 						CreatedOnToolsVersion = 7.2.1;
+						DevelopmentTeam = C3YDZ7M5S2;
 					};
 					54F4ED471C86C9C20031A9BB = {
 						CreatedOnToolsVersion = 7.2.1;
@@ -233,6 +246,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				54F4ED421C86C9C20031A9BB /* LaunchScreen.storyboard in Resources */,
+				54F4ED661C86CA890031A9BB /* MainIPad.storyboard in Resources */,
 				54F4ED3F1C86C9C20031A9BB /* Assets.xcassets in Resources */,
 				54F4ED3A1C86C9C20031A9BB /* Main.storyboard in Resources */,
 			);
@@ -259,8 +273,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				54F4ED6C1C86CD5E0031A9BB /* DataSource.swift in Sources */,
 				54F4ED371C86C9C20031A9BB /* ViewController.swift in Sources */,
 				54F4ED351C86C9C20031A9BB /* AppDelegate.swift in Sources */,
+				54F4ED681C86CBFC0031A9BB /* MainIPhoneCVC.swift in Sources */,
+				54F4ED6A1C86CCF20031A9BB /* EventModel.swift in Sources */,
 				54F4ED3D1C86C9C20031A9BB /* EventsList.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -403,10 +420,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = EventsList/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "David-Vincent-Hanagan.EventsList";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -414,10 +433,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = EventsList/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "David-Vincent-Hanagan.EventsList";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
