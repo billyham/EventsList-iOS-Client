@@ -8,6 +8,11 @@
 
 import UIKit
 import CoreData
+import CloudKit
+import ProgramModel
+import Program
+
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,7 +21,44 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        // Override point for customization after application launch.
+        
+        // Initiate CloudKit subscription
+        
+        let notificationSettings = UIUserNotificationSettings.init(forTypes: UIUserNotificationType.Alert, categories: nil)
+        application.registerUserNotificationSettings(notificationSettings)
+        application.registerForRemoteNotifications()
+        
+        let subscription = CKSubscription.init(zoneID: CKRecordZoneID.init(zoneName: "Standard", ownerName: CKOwnerDefaultName) , options:CKSubscriptionOptions(rawValue:0))
+        
+        let notificationInfo = CKNotificationInfo.init()
+        notificationInfo.shouldSendContentAvailable = true
+        
+        subscription.notificationInfo = notificationInfo
+        
+        let publicDatabase = CKContainer.defaultContainer().publicCloudDatabase
+        publicDatabase.saveSubscription(subscription) { (subscription, error) -> Void in
+            
+            if (error) != nil{
+                print("error at saving subscription")
+            }
+        }
+        
+        // Test load coreData with sample objects
+        
+        let context = self.managedObjectContext
+        
+        var programAddition = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as? Program
+        
+        programAddition.title = "Rubbing Alchohol"
+        
+        var error = NSError
+        if (!managedObjectContext.save(error)){
+            print("error saving coredata \(error)")
+        }
+        
+        
+        
+        
         return true
     }
 
@@ -44,6 +86,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.saveContext()
     }
 
+    // MARK: - Handle Remote Notifications
+    
+    func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject], fetchCompletionHandler completionHandler: (UIBackgroundFetchResult) -> Void) {
+        
+        let newThing  = userInfo as? [String:NSObject]
+        
+        let cloudKitNotification = CKNotification.init(fromRemoteNotificationDictionary: newThing!)
+        print("received notification \(cloudKitNotification)")
+    }
+    
     // MARK: - Core Data stack
 
     lazy var applicationDocumentsDirectory: NSURL = {

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class EventModel: NSObject {
+class ProgramModel: NSObject {
 
     var title: String
     

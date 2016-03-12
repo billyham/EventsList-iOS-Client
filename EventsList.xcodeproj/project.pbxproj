@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		016591721C935867001EA073 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 016591711C935867001EA073 /* CloudKit.framework */; };
+		016591781C9397F0001EA073 /* Program+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016591741C9397F0001EA073 /* Program+CoreDataProperties.swift */; };
+		016591791C9397F0001EA073 /* Program.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016591751C9397F0001EA073 /* Program.swift */; };
+		0165917A1C9397F0001EA073 /* Date+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016591761C9397F0001EA073 /* Date+CoreDataProperties.swift */; };
+		0165917B1C9397F0001EA073 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016591771C9397F0001EA073 /* Date.swift */; };
 		54F4ED351C86C9C20031A9BB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED341C86C9C20031A9BB /* AppDelegate.swift */; };
 		54F4ED371C86C9C20031A9BB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED361C86C9C20031A9BB /* ViewController.swift */; };
 		54F4ED3A1C86C9C20031A9BB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 54F4ED381C86C9C20031A9BB /* Main.storyboard */; };
@@ -17,7 +22,7 @@
 		54F4ED581C86C9C20031A9BB /* EventsListUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED571C86C9C20031A9BB /* EventsListUITests.swift */; };
 		54F4ED661C86CA890031A9BB /* MainIPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 54F4ED651C86CA890031A9BB /* MainIPad.storyboard */; };
 		54F4ED681C86CBFC0031A9BB /* MainIPhoneCVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED671C86CBFC0031A9BB /* MainIPhoneCVC.swift */; };
-		54F4ED6A1C86CCF20031A9BB /* EventModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED691C86CCF20031A9BB /* EventModel.swift */; };
+		54F4ED6A1C86CCF20031A9BB /* ProgramModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED691C86CCF20031A9BB /* ProgramModel.swift */; };
 		54F4ED6C1C86CD5E0031A9BB /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED6B1C86CD5E0031A9BB /* DataSource.swift */; };
 /* End PBXBuildFile section */
 
@@ -39,6 +44,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		016591701C935859001EA073 /* EventsList.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = EventsList.entitlements; sourceTree = "<group>"; };
+		016591711C935867001EA073 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		016591741C9397F0001EA073 /* Program+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Program+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		016591751C9397F0001EA073 /* Program.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Program.swift; sourceTree = "<group>"; };
+		016591761C9397F0001EA073 /* Date+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		016591771C9397F0001EA073 /* Date.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
 		54F4ED311C86C9C20031A9BB /* EventsList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EventsList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		54F4ED341C86C9C20031A9BB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		54F4ED361C86C9C20031A9BB /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -55,7 +66,7 @@
 		54F4ED591C86C9C20031A9BB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		54F4ED651C86CA890031A9BB /* MainIPad.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainIPad.storyboard; sourceTree = "<group>"; };
 		54F4ED671C86CBFC0031A9BB /* MainIPhoneCVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainIPhoneCVC.swift; sourceTree = "<group>"; };
-		54F4ED691C86CCF20031A9BB /* EventModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventModel.swift; sourceTree = "<group>"; };
+		54F4ED691C86CCF20031A9BB /* ProgramModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgramModel.swift; sourceTree = "<group>"; };
 		54F4ED6B1C86CD5E0031A9BB /* DataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -64,6 +75,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				016591721C935867001EA073 /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,9 +96,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		016591731C9397A2001EA073 /* NSManangedObject subclasses */ = {
+			isa = PBXGroup;
+			children = (
+				016591741C9397F0001EA073 /* Program+CoreDataProperties.swift */,
+				016591751C9397F0001EA073 /* Program.swift */,
+				016591761C9397F0001EA073 /* Date+CoreDataProperties.swift */,
+				016591771C9397F0001EA073 /* Date.swift */,
+			);
+			name = "NSManangedObject subclasses";
+			sourceTree = "<group>";
+		};
 		54F4ED281C86C9C10031A9BB = {
 			isa = PBXGroup;
 			children = (
+				016591711C935867001EA073 /* CloudKit.framework */,
 				54F4ED331C86C9C20031A9BB /* EventsList */,
 				54F4ED4B1C86C9C20031A9BB /* EventsListTests */,
 				54F4ED561C86C9C20031A9BB /* EventsListUITests */,
@@ -107,6 +131,7 @@
 		54F4ED331C86C9C20031A9BB /* EventsList */ = {
 			isa = PBXGroup;
 			children = (
+				016591701C935859001EA073 /* EventsList.entitlements */,
 				54F4ED341C86C9C20031A9BB /* AppDelegate.swift */,
 				54F4ED361C86C9C20031A9BB /* ViewController.swift */,
 				54F4ED381C86C9C20031A9BB /* Main.storyboard */,
@@ -116,7 +141,8 @@
 				54F4ED3E1C86C9C20031A9BB /* Assets.xcassets */,
 				54F4ED431C86C9C20031A9BB /* Info.plist */,
 				54F4ED3B1C86C9C20031A9BB /* EventsList.xcdatamodeld */,
-				54F4ED691C86CCF20031A9BB /* EventModel.swift */,
+				016591731C9397A2001EA073 /* NSManangedObject subclasses */,
+				54F4ED691C86CCF20031A9BB /* ProgramModel.swift */,
 				54F4ED6B1C86CD5E0031A9BB /* DataSource.swift */,
 			);
 			path = EventsList;
@@ -209,6 +235,17 @@
 					54F4ED301C86C9C10031A9BB = {
 						CreatedOnToolsVersion = 7.2.1;
 						DevelopmentTeam = C3YDZ7M5S2;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
+								enabled = 1;
+							};
+						};
 					};
 					54F4ED471C86C9C20031A9BB = {
 						CreatedOnToolsVersion = 7.2.1;
@@ -273,12 +310,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				016591791C9397F0001EA073 /* Program.swift in Sources */,
+				0165917B1C9397F0001EA073 /* Date.swift in Sources */,
 				54F4ED6C1C86CD5E0031A9BB /* DataSource.swift in Sources */,
+				0165917A1C9397F0001EA073 /* Date+CoreDataProperties.swift in Sources */,
 				54F4ED371C86C9C20031A9BB /* ViewController.swift in Sources */,
 				54F4ED351C86C9C20031A9BB /* AppDelegate.swift in Sources */,
 				54F4ED681C86CBFC0031A9BB /* MainIPhoneCVC.swift in Sources */,
-				54F4ED6A1C86CCF20031A9BB /* EventModel.swift in Sources */,
+				54F4ED6A1C86CCF20031A9BB /* ProgramModel.swift in Sources */,
 				54F4ED3D1C86C9C20031A9BB /* EventsList.xcdatamodeld in Sources */,
+				016591781C9397F0001EA073 /* Program+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -420,11 +461,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = EventsList/EventsList.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = EventsList/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "David-Vincent-Hanagan.EventsList";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -433,11 +477,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = EventsList/EventsList.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = EventsList/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "David-Vincent-Hanagan.EventsList";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
@@ -509,6 +556,7 @@
 				54F4ED5E1C86C9C20031A9BB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		54F4ED5F1C86C9C20031A9BB /* Build configuration list for PBXNativeTarget "EventsListTests" */ = {
 			isa = XCConfigurationList;
@@ -517,6 +565,7 @@
 				54F4ED611C86C9C20031A9BB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		54F4ED621C86C9C20031A9BB /* Build configuration list for PBXNativeTarget "EventsListUITests" */ = {
 			isa = XCConfigurationList;
@@ -525,6 +574,7 @@
 				54F4ED641C86C9C20031A9BB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

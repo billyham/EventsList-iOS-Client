@@ -1,4 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model name="Test1.xcdatamodel" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
-    <elements/>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9525" systemVersion="14F1605" minimumToolsVersion="Automatic">
+    <entity name="Date" representedClassName=".Date" syncable="YES">
+        <attribute name="dateAvailable" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="dateEnd" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="dateStart" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="hideFromPublic" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="live" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <relationship name="programRef" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Program" syncable="YES"/>
+    </entity>
+    <entity name="Program" representedClassName=".Program" syncable="YES">
+        <attribute name="classInfo" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dateEnd" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="dateStart" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="descFull" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="descMed" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="descShort" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="filmInfo" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="hideFromPublic" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="imageLarge" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="imageSmall" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="ticketLink" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="venue" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="video" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Program" positionX="-63" positionY="-18" width="128" height="255"/>
+        <element name="Date" positionX="-54" positionY="-9" width="128" height="135"/>
+    </elements>
 </model>
