@@ -9,7 +9,7 @@
 import UIKit
 
 private let reuseIdentifier = "Cell"
-private var arrayOfEvents = [EventModel]()
+private var arrayOfEvents = [ProgramModel]()
 
 class MainIPhoneCVC: UICollectionViewController {
 
@@ -23,8 +23,8 @@ class MainIPhoneCVC: UICollectionViewController {
         self.collectionView!.registerClass(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
 
         // Do any additional setup after loading the view.
-        arrayOfEvents.append(EventModel(title: "Rosebud"))
-        arrayOfEvents.append(EventModel(title: "Feather For Ferdinand"))
+        arrayOfEvents.append(ProgramModel(title: "Rosebud"))
+        arrayOfEvents.append(ProgramModel(title: "Feather For Ferdinand"))
     }
 
     override func didReceiveMemoryWarning() {

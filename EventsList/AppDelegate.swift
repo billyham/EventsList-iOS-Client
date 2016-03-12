@@ -9,8 +9,6 @@
 import UIKit
 import CoreData
 import CloudKit
-import ProgramModel
-import Program
 
 
 
@@ -19,45 +17,89 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+    func testZone(zoneString: String, completion:(result: Bool) -> Void) {
         
-        // Initiate CloudKit subscription
+        let container = CKContainer.init(identifier: "iCloud.David-Vincent-Hanagan.EventsList")
+        let database = container.privateCloudDatabase
         
-        let notificationSettings = UIUserNotificationSettings.init(forTypes: UIUserNotificationType.Alert, categories: nil)
-        application.registerUserNotificationSettings(notificationSettings)
-        application.registerForRemoteNotifications()
+        let recordZoneID = CKRecordZoneID.init(zoneName: "Standard", ownerName: CKOwnerDefaultName)
         
-        let subscription = CKSubscription.init(zoneID: CKRecordZoneID.init(zoneName: "Standard", ownerName: CKOwnerDefaultName) , options:CKSubscriptionOptions(rawValue:0))
-        
-        let notificationInfo = CKNotificationInfo.init()
-        notificationInfo.shouldSendContentAvailable = true
-        
-        subscription.notificationInfo = notificationInfo
-        
-        let publicDatabase = CKContainer.defaultContainer().publicCloudDatabase
-        publicDatabase.saveSubscription(subscription) { (subscription, error) -> Void in
+        database.fetchRecordZoneWithID(recordZoneID) { (recordZone, error) -> Void in
             
-            if (error) != nil{
-                print("error at saving subscription")
+            if ((error) != nil){
+                let recordZone = CKRecordZone.init(zoneName: "Standard")
+                let array = [recordZone]
+                let operation = CKModifyRecordZonesOperation.init(recordZonesToSave: array, recordZoneIDsToDelete: nil)
+                operation.modifyRecordZonesCompletionBlock = {(saved, _, error) in
+                    if ((error) != nil){
+                        print("failed to create Standard zone")
+                        completion(result: false)
+                    }else{
+                        completion(result: true)
+                    }
+                }
+                database.addOperation(operation)
+                
+            }else{
+                completion(result: true)
             }
         }
+        
+    }
+    
+    
+    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+        
+        // Test if CKSubscription exists
+        
+        let publicDatabase = CKContainer.defaultContainer().publicCloudDatabase
+        publicDatabase.fetchSubscriptionWithID("newProgram") { (subscription, error) -> Void in
+            
+            if (error) != nil{
+                print("error trying to retrieve subscriptions \(error)")
+            }
+            
+            if subscription == nil {
+                
+                // Initiate CloudKit subscription
+                
+                let notificationSettings = UIUserNotificationSettings.init(forTypes: UIUserNotificationType.Alert, categories: nil)
+                application.registerUserNotificationSettings(notificationSettings)
+                application.registerForRemoteNotifications()
+                
+                let predicate = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
+                let subscription = CKSubscription.init(recordType: "Program", predicate: predicate, subscriptionID:"newProgram" , options: CKSubscriptionOptions.FiresOnRecordCreation)
+                
+                let notificationInfo = CKNotificationInfo.init()
+                notificationInfo.shouldBadge = true
+                notificationInfo.alertLocalizationKey = "New program added"
+                notificationInfo.shouldSendContentAvailable = true
+                
+                subscription.notificationInfo = notificationInfo
+                
+                publicDatabase.saveSubscription(subscription) { (subscription, error) -> Void in
+                    
+                    if (error) != nil{
+                        print("error at saving subscription: \(error)")
+                    }
+                }
+            }
+        }
+
         
         // Test load coreData with sample objects
         
         let context = self.managedObjectContext
         
-        var programAddition = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as? Program
-        
+        let programAddition = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
         programAddition.title = "Rubbing Alchohol"
         
-        var error = NSError
-        if (!managedObjectContext.save(error)){
-            print("error saving coredata \(error)")
+        do {
+            try context.save()
+        }catch{
+            fatalError("Failure to save context: \(error)")
         }
-        
-        
-        
+    
         
         return true
     }
@@ -94,6 +136,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let cloudKitNotification = CKNotification.init(fromRemoteNotificationDictionary: newThing!)
         print("received notification \(cloudKitNotification)")
+        
+        completionHandler(UIBackgroundFetchResult.NewData)
     }
     
     // MARK: - Core Data stack
