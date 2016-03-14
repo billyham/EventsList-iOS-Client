@@ -24,8 +24,9 @@
         <attribute name="venue" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="video" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
+    <fetchRequest name="programsPublic" entity="Program" predicateString="hideFromPublic != 1"/>
     <elements>
-        <element name="Program" positionX="-63" positionY="-18" width="128" height="255"/>
         <element name="Date" positionX="-54" positionY="-9" width="128" height="135"/>
+        <element name="Program" positionX="-63" positionY="-18" width="128" height="255"/>
     </elements>
 </model>

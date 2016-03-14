@@ -88,18 +88,42 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         
         // Test load coreData with sample objects
-        
         let context = self.managedObjectContext
+        let requestAllPrograms = NSFetchRequest.init(entityName: "Program")
         
-        let programAddition = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
-        programAddition.title = "Rubbing Alchohol"
+        do{
+            let allPrograms = try context.executeFetchRequest(requestAllPrograms)
+            
+            for object in allPrograms{
+                context.deleteObject(object as! Program)
+            }
+            
+        }catch let error as NSError{
+            print("Failed to make initial fetch request \(error)")
+        }
+        
+        let programAddition1 = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
+        programAddition1.title = "Rubbing Alchohol"
+        
+        let programAddition2 = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
+        programAddition2.title = "Blubber Lips"
+        programAddition2.hideFromPublic = 0
+        
+        let programAddition3 = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
+        programAddition3.title = "Helluva Day"
+        programAddition3.hideFromPublic = 1
         
         do {
             try context.save()
         }catch{
             fatalError("Failure to save context: \(error)")
         }
+        
     
+        // Pass the CoreData context to the main view controller
+        let navigationController = self.window!.rootViewController as! UINavigationController
+        let controller = navigationController.topViewController as! MainIPhoneCVC
+        controller.myContext = self.managedObjectContext;
         
         return true
     }

@@ -7,11 +7,17 @@
 //
 
 import UIKit
+import CoreData
+import CloudKit
+
 
 private let reuseIdentifier = "Cell"
 private var arrayOfEvents = [ProgramModel]()
 
+
 class MainIPhoneCVC: UICollectionViewController {
+    
+    internal var myContext: NSManagedObjectContext?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,9 +28,29 @@ class MainIPhoneCVC: UICollectionViewController {
         // Register cell classes
         self.collectionView!.registerClass(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
 
-        // Do any additional setup after loading the view.
-        arrayOfEvents.append(ProgramModel(title: "Rosebud"))
-        arrayOfEvents.append(ProgramModel(title: "Feather For Ferdinand"))
+        
+        // Get data from coredata
+        
+        let request = NSFetchRequest.init(entityName: "Program")
+        request.predicate = NSPredicate.init(format: "hideFromPublic == nil OR hideFromPublic == 0", argumentArray: nil)
+        
+        //execute the fetch and add to array
+        do {
+            let arrayResult = try myContext?.executeFetchRequest(request)
+            print("count of array from coredata \(arrayResult!.count) \(arrayResult!)")
+            
+            for object in arrayResult!{
+                if object.title != nil{
+                    arrayOfEvents.append(ProgramModel.init(title: object.title!!))
+                }
+            }
+//            arrayOfEvents.appendContentsOf(arrayResult as! Array)
+        }catch let error as NSError{
+            print("Failed to execute CoreData fetch: \(error)")
+        }
+        
+        
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -65,9 +91,7 @@ class MainIPhoneCVC: UICollectionViewController {
         let newLabel = UILabel(frame: CGRectMake(0, 0, cell.contentView.frame.size.width, cell.contentView.frame.size.height))
         newLabel.text = modelObject.title
         cell.contentView.addSubview(newLabel)
-        
-        print("this is the modelObject title: \(modelObject.title)")
-    
+            
         return cell
     }
 

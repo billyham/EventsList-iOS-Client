@@ -13,7 +13,6 @@
 		0165917A1C9397F0001EA073 /* Date+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016591761C9397F0001EA073 /* Date+CoreDataProperties.swift */; };
 		0165917B1C9397F0001EA073 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016591771C9397F0001EA073 /* Date.swift */; };
 		54F4ED351C86C9C20031A9BB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED341C86C9C20031A9BB /* AppDelegate.swift */; };
-		54F4ED371C86C9C20031A9BB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED361C86C9C20031A9BB /* ViewController.swift */; };
 		54F4ED3A1C86C9C20031A9BB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 54F4ED381C86C9C20031A9BB /* Main.storyboard */; };
 		54F4ED3D1C86C9C20031A9BB /* EventsList.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED3B1C86C9C20031A9BB /* EventsList.xcdatamodeld */; };
 		54F4ED3F1C86C9C20031A9BB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 54F4ED3E1C86C9C20031A9BB /* Assets.xcassets */; };
@@ -52,7 +51,6 @@
 		016591771C9397F0001EA073 /* Date.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
 		54F4ED311C86C9C20031A9BB /* EventsList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EventsList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		54F4ED341C86C9C20031A9BB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		54F4ED361C86C9C20031A9BB /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		54F4ED391C86C9C20031A9BB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		54F4ED3C1C86C9C20031A9BB /* EventsList.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = EventsList.xcdatamodel; sourceTree = "<group>"; };
 		54F4ED3E1C86C9C20031A9BB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -133,7 +131,6 @@
 			children = (
 				016591701C935859001EA073 /* EventsList.entitlements */,
 				54F4ED341C86C9C20031A9BB /* AppDelegate.swift */,
-				54F4ED361C86C9C20031A9BB /* ViewController.swift */,
 				54F4ED381C86C9C20031A9BB /* Main.storyboard */,
 				54F4ED671C86CBFC0031A9BB /* MainIPhoneCVC.swift */,
 				54F4ED651C86CA890031A9BB /* MainIPad.storyboard */,
@@ -314,7 +311,6 @@
 				0165917B1C9397F0001EA073 /* Date.swift in Sources */,
 				54F4ED6C1C86CD5E0031A9BB /* DataSource.swift in Sources */,
 				0165917A1C9397F0001EA073 /* Date+CoreDataProperties.swift in Sources */,
-				54F4ED371C86C9C20031A9BB /* ViewController.swift in Sources */,
 				54F4ED351C86C9C20031A9BB /* AppDelegate.swift in Sources */,
 				54F4ED681C86CBFC0031A9BB /* MainIPhoneCVC.swift in Sources */,
 				54F4ED6A1C86CCF20031A9BB /* ProgramModel.swift in Sources */,
