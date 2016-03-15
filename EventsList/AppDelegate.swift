@@ -50,6 +50,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
+        // Save Initial user defaults
+        
+        let sampleDefault = ["key": "someValue"]
+        let changeToken = ["PrevoiusChangeToken": "fakeData"]
+        
+        let appDefaults = ["firstDictionary": sampleDefault, "SubscriptionKeys": changeToken]
+        
+        let standardDefaults = NSUserDefaults.standardUserDefaults()
+        standardDefaults.registerDefaults(appDefaults)
+        
+        
         // Test if CKSubscription exists
         
         let publicDatabase = CKContainer.defaultContainer().publicCloudDatabase
@@ -85,9 +96,44 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
         }
-
+        
+        
+        // Fetch Changed Records from CloudKit
+        
+        let serverChangeToken: CKServerChangeToken? = previousChangeToken
+        let notificationChangesOperation = CKFetchNotificationChangesOperation(previousServerChangeToken: serverChangeToken)
+        
+        print("this is the notificationChangesOperation: \(notificationChangesOperation)")
+        
+        var fetchedRecordIDs = [CKRecordID]()
+        
+        notificationChangesOperation.notificationChangedBlock = {notification in
+            
+            let queryNote = notification as! CKQueryNotification
+            
+            if (fetchedRecordIDs.contains(queryNote.recordID!)) {
+                fetchedRecordIDs.append(queryNote.recordID!)
+                print("Added a recordID to the array")
+            }
+        }
+        
+        notificationChangesOperation.fetchNotificationChangesCompletionBlock = {serverChangeToken, error in
+            if ((error) != nil) {
+                print("failed to fetch notification with \(error)")
+            }
+            
+            self.previousChangeToken = serverChangeToken
+            
+//            completionHandler(recordIDs: fetchedRecordIDs, error: error)
+        }
+        
+        CKContainer.defaultContainer().addOperation(notificationChangesOperation)
+        
+        
+        
         
         // Test load coreData with sample objects
+        
         let context = self.managedObjectContext
         let requestAllPrograms = NSFetchRequest.init(entityName: "Program")
         
@@ -162,6 +208,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("received notification \(cloudKitNotification)")
         
         completionHandler(UIBackgroundFetchResult.NewData)
+    }
+    
+    // MARK: - Access User Defaults
+    
+    // This is a computed property
+    var previousChangeToken:CKServerChangeToken? {
+        get {
+            let encodedObjectData = NSUserDefaults.standardUserDefaults().objectForKey("SubscriptionKeys")?.objectForKey("PreviousChangeToken") as? NSData
+            
+            if ((encodedObjectData) != nil) {
+                return NSKeyedUnarchiver.unarchiveObjectWithData(encodedObjectData!) as? CKServerChangeToken
+            }
+            
+            return nil
+        }
+        set(newToken) {
+            if ((newToken) != nil) {
+                print("new token \(newToken)")
+                
+                NSUserDefaults.standardUserDefaults().setObject(["PreviousChangeToken": NSKeyedArchiver.archivedDataWithRootObject(newToken!)], forKey: "SubscriptionKeys")
+            }
+        }
     }
     
     // MARK: - Core Data stack
