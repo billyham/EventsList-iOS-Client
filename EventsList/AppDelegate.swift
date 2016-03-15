@@ -50,7 +50,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
-        // Save Initial user defaults
+        // #### Save Initial user defaults ####
         
         let sampleDefault = ["key": "someValue"]
         let changeToken = ["PrevoiusChangeToken": "fakeData"]
@@ -61,8 +61,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         standardDefaults.registerDefaults(appDefaults)
         
         
-        // Test if CKSubscription exists
+        // #### Initiate CloudKit subscription ####
         
+        // Test if subscription already exists
         let publicDatabase = CKContainer.defaultContainer().publicCloudDatabase
         publicDatabase.fetchSubscriptionWithID("newProgram") { (subscription, error) -> Void in
             
@@ -72,7 +73,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             if subscription == nil {
                 
-                // Initiate CloudKit subscription
+                // Create subscription
                 
                 let notificationSettings = UIUserNotificationSettings.init(forTypes: UIUserNotificationType.Alert, categories: nil)
                 application.registerUserNotificationSettings(notificationSettings)
@@ -84,6 +85,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 let notificationInfo = CKNotificationInfo.init()
                 notificationInfo.shouldBadge = true
                 notificationInfo.alertLocalizationKey = "New program added"
+                notificationInfo.alertLocalizationArgs = ["recordID"]
                 notificationInfo.shouldSendContentAvailable = true
                 
                 subscription.notificationInfo = notificationInfo
@@ -98,26 +100,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         
-        // Fetch Changed Records from CloudKit
+        // #### Fetch Changed Records from CloudKit ####
         
         let serverChangeToken: CKServerChangeToken? = previousChangeToken
         let notificationChangesOperation = CKFetchNotificationChangesOperation(previousServerChangeToken: serverChangeToken)
-        
-        print("this is the notificationChangesOperation: \(notificationChangesOperation)")
-        
         var fetchedRecordIDs = [CKRecordID]()
         
+//        print("this is the notificationChangesOperation: \(notificationChangesOperation)")
+        
+        
         notificationChangesOperation.notificationChangedBlock = {notification in
-            
+            print("Inside changesOperation change block")
             let queryNote = notification as! CKQueryNotification
             
-            if (fetchedRecordIDs.contains(queryNote.recordID!)) {
+            if (!fetchedRecordIDs.contains(queryNote.recordID!)) {
                 fetchedRecordIDs.append(queryNote.recordID!)
                 print("Added a recordID to the array")
             }
         }
         
         notificationChangesOperation.fetchNotificationChangesCompletionBlock = {serverChangeToken, error in
+            print("Inside changesOperation completion block")
             if ((error) != nil) {
                 print("failed to fetch notification with \(error)")
             }
@@ -132,7 +135,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         
         
-        // Test load coreData with sample objects
+        // #### Test load coreData with sample objects ####
         
         let context = self.managedObjectContext
         let requestAllPrograms = NSFetchRequest.init(entityName: "Program")
@@ -225,7 +228,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         set(newToken) {
             if ((newToken) != nil) {
-                print("new token \(newToken)")
+                print("set new token as \(newToken)")
                 
                 NSUserDefaults.standardUserDefaults().setObject(["PreviousChangeToken": NSKeyedArchiver.archivedDataWithRootObject(newToken!)], forKey: "SubscriptionKeys")
             }
