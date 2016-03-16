@@ -79,13 +79,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 application.registerUserNotificationSettings(notificationSettings)
                 application.registerForRemoteNotifications()
                 
+                let options = CKSubscriptionOptions.FiresOnRecordCreation.union(
+                    CKSubscriptionOptions.FiresOnRecordDeletion).union(CKSubscriptionOptions.FiresOnRecordUpdate)
+                
                 let predicate = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
-                let subscription = CKSubscription.init(recordType: "Program", predicate: predicate, subscriptionID:"newProgram" , options: CKSubscriptionOptions.FiresOnRecordCreation)
+                let subscription = CKSubscription.init(recordType: "Program", predicate: predicate, subscriptionID:"newProgram" , options: options)
                 
                 let notificationInfo = CKNotificationInfo.init()
                 notificationInfo.shouldBadge = true
-                notificationInfo.alertLocalizationKey = "New program added"
-                notificationInfo.alertLocalizationArgs = ["recordID"]
+                notificationInfo.alertLocalizationKey = "Change to EventsList"
                 notificationInfo.shouldSendContentAvailable = true
                 
                 subscription.notificationInfo = notificationInfo
@@ -102,35 +104,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // #### Fetch Changed Records from CloudKit ####
         
-        let serverChangeToken: CKServerChangeToken? = previousChangeToken
-        let notificationChangesOperation = CKFetchNotificationChangesOperation(previousServerChangeToken: serverChangeToken)
-        var fetchedRecordIDs = [CKRecordID]()
+        self.queryForRecordIDs({ success in
         
-//        print("this is the notificationChangesOperation: \(notificationChangesOperation)")
-        
-        
-        notificationChangesOperation.notificationChangedBlock = {notification in
-            print("Inside changesOperation change block")
-            let queryNote = notification as! CKQueryNotification
-            
-            if (!fetchedRecordIDs.contains(queryNote.recordID!)) {
-                fetchedRecordIDs.append(queryNote.recordID!)
-                print("Added a recordID to the array")
-            }
-        }
-        
-        notificationChangesOperation.fetchNotificationChangesCompletionBlock = {serverChangeToken, error in
-            print("Inside changesOperation completion block")
-            if ((error) != nil) {
-                print("failed to fetch notification with \(error)")
-            }
-            
-            self.previousChangeToken = serverChangeToken
-            
-//            completionHandler(recordIDs: fetchedRecordIDs, error: error)
-        }
-        
-        CKContainer.defaultContainer().addOperation(notificationChangesOperation)
+        })
         
         
         
@@ -210,7 +186,131 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let cloudKitNotification = CKNotification.init(fromRemoteNotificationDictionary: newThing!)
         print("received notification \(cloudKitNotification)")
         
-        completionHandler(UIBackgroundFetchResult.NewData)
+        self.queryForRecordIDs { (success) -> Void in
+            
+            if (success){
+                completionHandler(UIBackgroundFetchResult.NewData)
+            }else{
+                completionHandler(UIBackgroundFetchResult.Failed)
+            }
+        }
+    }
+    
+    // MARK: - Use CloudKit to retrieve CloudKit recordIDs and then records
+    
+    func queryForRecordIDs(completionHandler:(success: Bool) -> Void) -> Void {
+        
+        let serverChangeToken: CKServerChangeToken? = previousChangeToken
+        let notificationChangesOperation = CKFetchNotificationChangesOperation(previousServerChangeToken: serverChangeToken)
+        
+        var newRecordIDs = [CKRecordID]()
+        var deleteRecordIDs = [CKRecordID]()
+        var updateRecordIDs = [CKRecordID]()
+        
+        //        print("this is the notificationChangesOperation: \(notificationChangesOperation)")
+        
+        
+        notificationChangesOperation.notificationChangedBlock = {notification in
+            
+            let queryNote = notification as! CKQueryNotification
+            
+            // #### Determine reason for change and act accordingly ####
+            
+            if queryNote.queryNotificationReason == CKQueryNotificationReason.RecordCreated{
+                if (!newRecordIDs.contains(queryNote.recordID!)) {
+                    newRecordIDs.append(queryNote.recordID!)
+                }
+            }else if queryNote.queryNotificationReason == CKQueryNotificationReason.RecordDeleted{
+                if (!deleteRecordIDs.contains(queryNote.recordID!)) {
+                    deleteRecordIDs.append(queryNote.recordID!)
+                }
+            }else if queryNote.queryNotificationReason == CKQueryNotificationReason.RecordUpdated{
+                if (!updateRecordIDs.contains(queryNote.recordID!)) {
+                    updateRecordIDs.append(queryNote.recordID!)
+                }
+            }
+        }
+        
+        notificationChangesOperation.fetchNotificationChangesCompletionBlock = {serverChangeToken, error in
+
+            if ((error) != nil) {
+                print("failed to fetch notification with \(error)")
+                completionHandler(success: false)
+            }
+            
+            self.previousChangeToken = serverChangeToken
+            
+            // #### 1. ADD new records ####
+            
+            self.queryMessagesWithIDs(newRecordIDs, completionHandler: { (messages, error) -> Void in
+                
+                if ((error) != nil){
+                    print("Error in queryMessagesWithIDs: \(error)")
+                    completionHandler(success: false)
+                }
+                
+                for record in messages {
+                    print("Here is a new title: \(record.objectForKey("title"))")
+                    completionHandler(success: true)
+                }
+            })
+            
+            // #### 2. DELETE records ####
+            
+            if deleteRecordIDs.count > 0 {
+                completionHandler(success: true)
+            }
+            
+            
+            // #### 3. UPDATE existing records ####
+            
+            self.queryMessagesWithIDs(updateRecordIDs, completionHandler: { (messages, error) -> Void in
+                
+                if ((error) != nil){
+                    print("Error in queryMessagesWithIDs: \(error)")
+                    completionHandler(success: false)
+                }
+                
+                for record in messages {
+                    print("Here is an updated title: \(record.objectForKey("title"))")
+                    completionHandler(success: true)
+                }
+            })
+            
+        }
+        
+        CKContainer.defaultContainer().addOperation(notificationChangesOperation)
+        
+    }
+    
+    
+    func queryMessagesWithIDs(IDs:[CKRecordID], completionHandler: ([CKRecord]!, NSError!) -> Void) -> Void {
+        
+        let fetchRecordsOperation = CKFetchRecordsOperation(recordIDs: IDs)
+        
+        var newMessages = [CKRecord]()
+        
+        fetchRecordsOperation.perRecordCompletionBlock = {record, recordID, error in
+            if ((error == nil)){
+                newMessages.append(record!)
+            }else{
+                print("failed to get message with ID \(error)")
+            }
+        }
+        
+        fetchRecordsOperation.fetchRecordsCompletionBlock = {_, error in
+            if ((error) != nil){
+                print("completion block error: \(error)")
+            }else{
+                newMessages.sortInPlace{$0.creationDate!.compare($1.creationDate!) == NSComparisonResult.OrderedAscending}
+            }
+            
+            dispatch_async(dispatch_get_main_queue(), {completionHandler(newMessages, error)})
+        }
+        
+        let publicDatabase = CKContainer.defaultContainer().publicCloudDatabase
+        publicDatabase.addOperation(fetchRecordsOperation)
+        
     }
     
     // MARK: - Access User Defaults

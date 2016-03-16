@@ -37,7 +37,7 @@ class MainIPhoneCVC: UICollectionViewController {
         //execute the fetch and add to array
         do {
             let arrayResult = try myContext?.executeFetchRequest(request)
-            print("count of array from coredata \(arrayResult!.count) \(arrayResult!)")
+//            print("count of array from coredata \(arrayResult!.count) \(arrayResult!)")
             
             for object in arrayResult!{
                 if object.title != nil{
