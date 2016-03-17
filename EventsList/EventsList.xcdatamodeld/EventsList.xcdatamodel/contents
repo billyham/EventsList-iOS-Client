@@ -9,6 +9,8 @@
         <relationship name="programRef" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Program" syncable="YES"/>
     </entity>
     <entity name="Program" representedClassName=".Program" syncable="YES">
+        <attribute name="ckRecord" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="ckRecordName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="classInfo" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="dateEnd" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="dateStart" optional="YES" attributeType="Date" syncable="YES"/>
@@ -27,6 +29,6 @@
     <fetchRequest name="programsPublic" entity="Program" predicateString="hideFromPublic != 1"/>
     <elements>
         <element name="Date" positionX="-54" positionY="-9" width="128" height="135"/>
-        <element name="Program" positionX="-63" positionY="-18" width="128" height="255"/>
+        <element name="Program" positionX="-63" positionY="-18" width="128" height="285"/>
     </elements>
 </model>

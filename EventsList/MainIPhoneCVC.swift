@@ -39,11 +39,17 @@ class MainIPhoneCVC: UICollectionViewController {
             let arrayResult = try myContext?.executeFetchRequest(request)
 //            print("count of array from coredata \(arrayResult!.count) \(arrayResult!)")
             
+            print("Executing coreData query in CVC")
+            
             for object in arrayResult!{
+                print("Adding item in loop")
                 if object.title != nil{
                     arrayOfEvents.append(ProgramModel.init(title: object.title!!))
                 }
             }
+            
+            self.collectionView?.reloadData()
+            
 //            arrayOfEvents.appendContentsOf(arrayResult as! Array)
         }catch let error as NSError{
             print("Failed to execute CoreData fetch: \(error)")

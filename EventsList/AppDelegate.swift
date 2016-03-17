@@ -101,54 +101,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
         
+        // #### Pass the CoreData context to the main view controller ####
+        let navigationController = self.window!.rootViewController as! UINavigationController
+        let controller = navigationController.topViewController as! MainIPhoneCVC
+        controller.myContext = self.managedObjectContext;
+        
         
         // #### Fetch Changed Records from CloudKit ####
-        
         self.queryForRecordIDs({ success in
         
         })
         
         
-        
-        
         // #### Test load coreData with sample objects ####
-        
-        let context = self.managedObjectContext
-        let requestAllPrograms = NSFetchRequest.init(entityName: "Program")
-        
-        do{
-            let allPrograms = try context.executeFetchRequest(requestAllPrograms)
-            
-            for object in allPrograms{
-                context.deleteObject(object as! Program)
-            }
-            
-        }catch let error as NSError{
-            print("Failed to make initial fetch request \(error)")
-        }
-        
-        let programAddition1 = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
-        programAddition1.title = "Rubbing Alchohol"
-        
-        let programAddition2 = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
-        programAddition2.title = "Blubber Lips"
-        programAddition2.hideFromPublic = 0
-        
-        let programAddition3 = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
-        programAddition3.title = "Helluva Day"
-        programAddition3.hideFromPublic = 1
-        
-        do {
-            try context.save()
-        }catch{
-            fatalError("Failure to save context: \(error)")
-        }
-        
-    
-        // Pass the CoreData context to the main view controller
-        let navigationController = self.window!.rootViewController as! UINavigationController
-        let controller = navigationController.topViewController as! MainIPhoneCVC
-        controller.myContext = self.managedObjectContext;
+        self.loadSampleData()
         
         return true
     }
@@ -176,6 +142,51 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Saves changes in the application's managed object context before the application terminates.
         self.saveContext()
     }
+    
+    // MARK: - Load CoreData with CloudKit data
+    
+    func addPrograms(arrayOfCKRecords: [CKRecord]) {
+        
+        let context = self.managedObjectContext
+        
+        for record in arrayOfCKRecords {
+            
+            let programAddition = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
+            programAddition.title = record.objectForKey("title") as? String
+            programAddition.ckRecordName = record.recordID.recordName
+            
+            // Save CKRecord System properties to managed object
+            let archivedData = NSMutableData()
+            let archiver = NSKeyedArchiver(forWritingWithMutableData: archivedData)
+            archiver.requiresSecureCoding = true
+            record.encodeSystemFieldsWithCoder(archiver)
+            archiver.finishEncoding()
+            programAddition.ckRecord = archivedData
+            
+            programAddition.hideFromPublic = 0
+        }
+        
+        do {
+            try context.save()
+            
+            // Refresh the collectionView
+            let navigationController = self.window!.rootViewController as! UINavigationController
+            let controller = navigationController.topViewController as! MainIPhoneCVC
+            controller.collectionView?.reloadData()
+            
+        }catch{
+            fatalError("Failure to save context: \(error)")
+        }
+    }
+    
+    func deletePrograms() {
+        
+    }
+    
+    func updatePrograms() {
+        
+    }
+    
 
     // MARK: - Handle Remote Notifications
     
@@ -238,6 +249,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 completionHandler(success: false)
             }
             
+            // Exit if the tokens are identitcal 
+            if self.previousChangeToken == serverChangeToken {
+                print("Exit from fetchNotificationChangesCompletionBlock because token hasn't changed")
+                completionHandler(success: true)
+                return
+            }
+            
             self.previousChangeToken = serverChangeToken
             
             // #### 1. ADD new records ####
@@ -248,6 +266,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     print("Error in queryMessagesWithIDs: \(error)")
                     completionHandler(success: false)
                 }
+                
+                // Save CKRecords to CoreData
+                self.addPrograms(messages)
                 
                 for record in messages {
                     print("Here is a new title: \(record.objectForKey("title"))")
@@ -311,6 +332,43 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let publicDatabase = CKContainer.defaultContainer().publicCloudDatabase
         publicDatabase.addOperation(fetchRecordsOperation)
         
+    }
+    
+    // MARK: - Sample CoreData text
+    
+    func loadSampleData() {
+     
+        let context = self.managedObjectContext
+        let requestAllPrograms = NSFetchRequest.init(entityName: "Program")
+        
+        do{
+            let allPrograms = try context.executeFetchRequest(requestAllPrograms)
+            
+            for object in allPrograms{
+//                context.deleteObject(object as! Program)
+                print("title: \(object.title) and recordName: \(object.recordName) ")
+            }
+            
+        }catch let error as NSError{
+            print("Failed to make initial fetch request \(error)")
+        }
+        
+//        let programAddition1 = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
+//        programAddition1.title = "Rubbing Alchohol"
+//        
+//        let programAddition2 = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
+//        programAddition2.title = "Blubber Lips"
+//        programAddition2.hideFromPublic = 0
+//        
+//        let programAddition3 = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
+//        programAddition3.title = "Helluva Day"
+//        programAddition3.hideFromPublic = 1
+//        
+//        do {
+//            try context.save()
+//        }catch{
+//            fatalError("Failure to save context: \(error)")
+//        }
     }
     
     // MARK: - Access User Defaults
