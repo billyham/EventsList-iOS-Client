@@ -11,11 +11,12 @@ import CoreData
 import CloudKit
 
 
-private let reuseIdentifier = "Cell"
-private var arrayOfEvents = [ProgramModel]()
 
 
 class MainIPhoneCVC: UICollectionViewController {
+    
+    private let reuseIdentifier = "Cell"
+    private var arrayOfEvents = [ProgramModel]()
     
     internal var myContext: NSManagedObjectContext?
 
@@ -28,8 +29,18 @@ class MainIPhoneCVC: UICollectionViewController {
         // Register cell classes
         self.collectionView!.registerClass(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
 
+        // Initially populate array with content and present collection view
+        self.updateCollectionView()
         
-        // Get data from coredata
+    }
+    
+    // MARK: - Public methods for changing content of collection view
+    
+    internal func updateCollectionView() {
+        
+        // #### Wholesale array replacement ####
+        
+        self.arrayOfEvents = []
         
         let request = NSFetchRequest.init(entityName: "Program")
         request.predicate = NSPredicate.init(format: "hideFromPublic == nil OR hideFromPublic == 0", argumentArray: nil)
@@ -37,26 +48,23 @@ class MainIPhoneCVC: UICollectionViewController {
         //execute the fetch and add to array
         do {
             let arrayResult = try myContext?.executeFetchRequest(request)
-//            print("count of array from coredata \(arrayResult!.count) \(arrayResult!)")
+            //            print("count of array from coredata \(arrayResult!.count) \(arrayResult!)")
             
             print("Executing coreData query in CVC")
             
             for object in arrayResult!{
                 print("Adding item in loop")
                 if object.title != nil{
-                    arrayOfEvents.append(ProgramModel.init(title: object.title!!))
+                    self.arrayOfEvents.append(ProgramModel.init(title: object.title!!))
                 }
             }
             
             self.collectionView?.reloadData()
             
-//            arrayOfEvents.appendContentsOf(arrayResult as! Array)
+            //            arrayOfEvents.appendContentsOf(arrayResult as! Array)
         }catch let error as NSError{
             print("Failed to execute CoreData fetch: \(error)")
         }
-        
-        
-        
     }
 
     override func didReceiveMemoryWarning() {
@@ -74,7 +82,7 @@ class MainIPhoneCVC: UICollectionViewController {
     }
     */
 
-    // MARK: UICollectionViewDataSource
+    // MARK: - UICollectionViewDataSource
 
     override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         return 1
@@ -82,7 +90,10 @@ class MainIPhoneCVC: UICollectionViewController {
 
 
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return arrayOfEvents.count
+        
+        print("numberOfItemsInSection fires with count: \(arrayOfEvents.count)")
+
+        return arrayOfEvents.count        
     }
 
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {

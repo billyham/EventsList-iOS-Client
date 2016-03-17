@@ -172,7 +172,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Refresh the collectionView
             let navigationController = self.window!.rootViewController as! UINavigationController
             let controller = navigationController.topViewController as! MainIPhoneCVC
-            controller.collectionView?.reloadData()
+            controller.updateCollectionView()
             
         }catch{
             fatalError("Failure to save context: \(error)")
