@@ -20,6 +20,8 @@ class MainIPhoneCVC: UICollectionViewController {
     
     internal var myContext: NSManagedObjectContext?
 
+    // MARK: - View methods
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -30,57 +32,112 @@ class MainIPhoneCVC: UICollectionViewController {
         self.collectionView!.registerClass(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
 
         // Initially populate array with content and present collection view
-        self.updateCollectionView()
+        self.updateCollectionView(type: "Add", arrayOfChanged: nil)
         
     }
     
     // MARK: - Public methods for changing content of collection view
     
-    internal func updateCollectionView() {
+    internal func updateCollectionView(type type: String, arrayOfChanged: [CKRecord]?) {
         
-        // #### Wholesale array replacement ####
-        
-        self.arrayOfEvents = []
+        // Get an updated array of Programs objects
         
         let request = NSFetchRequest.init(entityName: "Program")
         request.predicate = NSPredicate.init(format: "hideFromPublic == nil OR hideFromPublic == 0", argumentArray: nil)
+        request.sortDescriptors = [NSSortDescriptor.init(key: "title", ascending: true)]
         
-        //execute the fetch and add to array
+        var arrayOfNewEvents = [ProgramModel]()
+        
+        //execute the fetch and add to a new array
         do {
             let arrayResult = try myContext?.executeFetchRequest(request)
             //            print("count of array from coredata \(arrayResult!.count) \(arrayResult!)")
             
-            print("Executing coreData query in CVC")
-            
             for object in arrayResult!{
-                print("Adding item in loop")
-                if object.title != nil{
-                    self.arrayOfEvents.append(ProgramModel.init(title: object.title!!))
-                }
+                arrayOfNewEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: object.recordID.recordName))
             }
             
-            self.collectionView?.reloadData()
-            
-            //            arrayOfEvents.appendContentsOf(arrayResult as! Array)
         }catch let error as NSError{
             print("Failed to execute CoreData fetch: \(error)")
         }
+        
+        
+        
+        switch type{
+            
+        case "Add":
+            
+            if arrayOfChanged != nil{
+                
+                // Find destination indexpaths for added CKRecords
+                var arrayOfIndexPaths = arrayOfChanged.map{
+                    
+                    (var recordItem) -> NSIndexPath in
+                    
+                    for index in 0..<arrayOfNewEvents.count {
+                        
+                        if arrayOfNewEvents[index].ckRecordName == recordItem.recordID.recordName {
+                            return NSIndexPath.init(forRow: index, inSection: 0)
+                            break;
+                        }
+                    }
+                    
+                    
+                }
+                
+                
+                
+//                self.collectionView!.insertItemsAtIndexPaths
+                
+                
+            }else{
+                fallthrough
+            }
+            
+
+            
+            
+
+//        case "Delete":
+            
+            
+        default:
+            
+            // #### Wholesale array replacement ####
+            
+            self.arrayOfEvents = []
+            
+            //execute the fetch and add to array
+            do {
+                let arrayResult = try myContext?.executeFetchRequest(request)
+                //            print("count of array from coredata \(arrayResult!.count) \(arrayResult!)")
+                
+                print("Executing coreData query in CVC")
+                
+                for object in arrayResult!{
+                    print("Adding item in loop")
+                    if object.title != nil{
+                        self.arrayOfEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: object.recordID.recordName))
+                    }
+                }
+                
+                self.collectionView?.reloadData()
+                
+                //            arrayOfEvents.appendContentsOf(arrayResult as! Array)
+            }catch let error as NSError{
+                print("Failed to execute CoreData fetch: \(error)")
+            }
+            
+        }
+        
+
+        
+        
+        
+        
+        
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
-    }
-    */
 
     // MARK: - UICollectionViewDataSource
 
@@ -112,7 +169,7 @@ class MainIPhoneCVC: UICollectionViewController {
         return cell
     }
 
-    // MARK: UICollectionViewDelegate
+    // MARK: - UICollectionViewDelegate
 
     /*
     // Uncomment this method to specify if the specified item should be highlighted during tracking
@@ -142,5 +199,19 @@ class MainIPhoneCVC: UICollectionViewController {
     
     }
     */
+
+    /*
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+    }
+    */
+    
+    //MARK: - Memory Warning
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
 
 }

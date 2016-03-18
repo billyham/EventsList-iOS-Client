@@ -11,8 +11,10 @@ import UIKit
 class ProgramModel: NSObject {
 
     var title: String
+    var ckRecordName: String
     
-    init(title: String) {
+    init(title: String, ckRecordName: String) {
         self.title = title
+        self.ckRecordName = ckRecordName
     }
 }
