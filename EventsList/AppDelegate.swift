@@ -53,7 +53,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // #### Save Initial user defaults ####
         
         let sampleDefault = ["key": "someValue"]
-        let changeToken = ["PrevoiusChangeToken": "fakeData"]
+        let changeToken = ["PreviousChangeToken": "fakeData"]
         
         let appDefaults = ["firstDictionary": sampleDefault, "SubscriptionKeys": changeToken]
         
@@ -71,7 +71,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 print("error trying to retrieve subscriptions \(error)")
             }
             
-            if subscription == nil {
+            let secretValue: String = (NSUserDefaults.standardUserDefaults().objectForKey("firstDictionary")?.objectForKey("key"))! as! String
+            
+            print("Here is the secretValue: \(secretValue)")
+            
+            if subscription == nil || secretValue == "someValue"{
                 
                 // Create subscription
                 
@@ -96,6 +100,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     
                     if (error) != nil{
                         print("error at saving subscription: \(error)")
+                    }else{
+                        NSUserDefaults.standardUserDefaults().setObject(["key": "wrongValue"], forKey: "firstDictionary")
                     }
                 }
             }
@@ -111,10 +117,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.queryForRecordIDs({ success in
         
         })
-        
-        
-        // #### Test load coreData with sample objects ####
-        self.loadSampleData()
         
         return true
     }
@@ -177,10 +179,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }catch{
             fatalError("Failure to save context: \(error)")
         }
+        
     }
     
-    func deletePrograms() {
+    func deletePrograms(var arrayOfRecordIDs: [CKRecordID]?) {
         
+        let context = self.managedObjectContext
+        
+        if arrayOfRecordIDs != nil{
+            for recordID in arrayOfRecordIDs! {
+                
+                let request = NSFetchRequest.init(entityName: "Program")
+                request.predicate = NSPredicate.init(format: "ckRecordName == %@", argumentArray: [recordID.recordName])
+                
+                //execute the fetch and add to a new array
+                do {
+                    let arrayResult = try context.executeFetchRequest(request)
+                    if arrayResult.count > 0{
+                        context.deleteObject(arrayResult[0] as! NSManagedObject)
+                    }
+                }catch{
+                    print("Error trying to retrieve object to be deleted")
+                    arrayOfRecordIDs = nil
+                }
+            }
+        }
+        
+        // Refresh the collectionView
+        let navigationController = self.window!.rootViewController as! UINavigationController
+        let controller = navigationController.topViewController as! MainIPhoneCVC
+        controller.deleteFromCollectionView(arrayOfRecordIDs)
     }
     
     func updatePrograms() {
@@ -279,6 +307,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // #### 2. DELETE records ####
             
             if deleteRecordIDs.count > 0 {
+                self.deletePrograms(deleteRecordIDs)
                 completionHandler(success: true)
             }
             
@@ -334,42 +363,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
     }
     
-    // MARK: - Sample CoreData text
-    
-    func loadSampleData() {
-     
-        let context = self.managedObjectContext
-        let requestAllPrograms = NSFetchRequest.init(entityName: "Program")
-        
-        do{
-            let allPrograms = try context.executeFetchRequest(requestAllPrograms)
-            
-            for object in allPrograms{
-//                context.deleteObject(object as! Program)
-                print("title: \(object.title) and recordName: \(object.recordName) ")
-            }
-            
-        }catch let error as NSError{
-            print("Failed to make initial fetch request \(error)")
-        }
-        
-//        let programAddition1 = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
-//        programAddition1.title = "Rubbing Alchohol"
-//        
-//        let programAddition2 = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
-//        programAddition2.title = "Blubber Lips"
-//        programAddition2.hideFromPublic = 0
-//        
-//        let programAddition3 = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
-//        programAddition3.title = "Helluva Day"
-//        programAddition3.hideFromPublic = 1
-//        
-//        do {
-//            try context.save()
-//        }catch{
-//            fatalError("Failure to save context: \(error)")
-//        }
-    }
     
     // MARK: - Access User Defaults
     

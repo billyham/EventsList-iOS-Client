@@ -11,8 +11,6 @@ import CoreData
 import CloudKit
 
 
-
-
 class MainIPhoneCVC: UICollectionViewController {
     
     private let reuseIdentifier = "Cell"
@@ -54,13 +52,13 @@ class MainIPhoneCVC: UICollectionViewController {
             //            print("count of array from coredata \(arrayResult!.count) \(arrayResult!)")
             
             for object in arrayResult!{
-                arrayOfNewEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: object.recordID.recordName))
+                let newObject = object as! Program
+                arrayOfNewEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: newObject.ckRecordName!))
             }
             
         }catch let error as NSError{
             print("Failed to execute CoreData fetch: \(error)")
         }
-        
         
         
         switch type{
@@ -70,36 +68,44 @@ class MainIPhoneCVC: UICollectionViewController {
             if arrayOfChanged != nil{
                 
                 // Find destination indexpaths for added CKRecords
-                var arrayOfIndexPaths = arrayOfChanged.map{
+//                let arrayOfIndexPaths: [NSIndexPath] = arrayOfChanged.map({
+//                    recordItem in
+//                    
+//                    for i in 0..<arrayOfNewEvents.count {
+//                        
+//                        if arrayOfNewEvents[i].ckRecordName == recordItem.recordID.recordName {
+//                            return NSIndexPath.init(index: i)
+//                            break;
+//                        }
+//                    }
+//                    
+//                    
+//                })!
+                
+                var arrayOfIndexPaths = [NSIndexPath]()
+                
+                for record in arrayOfChanged! {
                     
-                    (var recordItem) -> NSIndexPath in
-                    
-                    for index in 0..<arrayOfNewEvents.count {
+                    for i in 0..<arrayOfNewEvents.count {
                         
-                        if arrayOfNewEvents[index].ckRecordName == recordItem.recordID.recordName {
-                            return NSIndexPath.init(forRow: index, inSection: 0)
-                            break;
+                        if record.recordID.recordName == arrayOfNewEvents[i].ckRecordName {
+                            arrayOfIndexPaths.append(NSIndexPath.init(forItem: i, inSection: 0))
+                            break
                         }
+                        
                     }
-                    
-                    
                 }
                 
-                
-                
-//                self.collectionView!.insertItemsAtIndexPaths
-                
+                if arrayOfIndexPaths.count > 0 {
+                    self.arrayOfEvents = arrayOfNewEvents
+                    self.collectionView!.insertItemsAtIndexPaths(arrayOfIndexPaths)
+                }
+            
                 
             }else{
+                
                 fallthrough
             }
-            
-
-            
-            
-
-//        case "Delete":
-            
             
         default:
             
@@ -110,14 +116,12 @@ class MainIPhoneCVC: UICollectionViewController {
             //execute the fetch and add to array
             do {
                 let arrayResult = try myContext?.executeFetchRequest(request)
-                //            print("count of array from coredata \(arrayResult!.count) \(arrayResult!)")
-                
-                print("Executing coreData query in CVC")
                 
                 for object in arrayResult!{
                     print("Adding item in loop")
                     if object.title != nil{
-                        self.arrayOfEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: object.recordID.recordName))
+                        let newObject = object as! Program
+                        self.arrayOfEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: newObject.ckRecordName!))
                     }
                 }
                 
@@ -127,17 +131,64 @@ class MainIPhoneCVC: UICollectionViewController {
             }catch let error as NSError{
                 print("Failed to execute CoreData fetch: \(error)")
             }
-            
         }
-        
-
-        
-        
-        
-        
-        
     }
 
+    internal func deleteFromCollectionView(arrayOfChanged:[CKRecordID]?) -> Void {
+        
+        // Get an updated array of Programs objects
+        
+        let request = NSFetchRequest.init(entityName: "Program")
+        request.predicate = NSPredicate.init(format: "hideFromPublic == nil OR hideFromPublic == 0", argumentArray: nil)
+        request.sortDescriptors = [NSSortDescriptor.init(key: "title", ascending: true)]
+        
+        var arrayOfNewEvents = [ProgramModel]()
+        
+        //execute the fetch and add to a new array
+        do {
+            let arrayResult = try myContext?.executeFetchRequest(request)
+            //            print("count of array from coredata \(arrayResult!.count) \(arrayResult!)")
+            
+            for object in arrayResult!{
+                let newObject = object as! Program
+                arrayOfNewEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: newObject.ckRecordName!))
+            }
+            
+        }catch let error as NSError{
+            print("Failed to execute CoreData fetch: \(error)")
+        }
+        
+        if arrayOfChanged != nil {
+            
+            var arrayOfIndexPaths = [NSIndexPath]()
+            
+            for recordID in arrayOfChanged! {
+                
+                for i in 0..<self.arrayOfEvents.count {
+                    
+                    if recordID.recordName == self.arrayOfEvents[i].ckRecordName {
+                        print("Found a matching record name to delete")
+                        arrayOfIndexPaths.append(NSIndexPath.init(forItem: i, inSection: 0))
+                        break
+                    }
+                    
+                }
+            }
+            
+            if arrayOfIndexPaths.count > 0 {
+                self.arrayOfEvents = arrayOfNewEvents
+                self.collectionView!.deleteItemsAtIndexPaths(arrayOfIndexPaths)
+            }
+            
+        }else{
+            
+            // #### Wholesale array replacement ####
+            
+            self.arrayOfEvents = arrayOfNewEvents
+            self.collectionView?.reloadData()
+        }
+    }
+    
 
     // MARK: - UICollectionViewDataSource
 
@@ -148,7 +199,7 @@ class MainIPhoneCVC: UICollectionViewController {
 
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        print("numberOfItemsInSection fires with count: \(arrayOfEvents.count)")
+        print("numberOfItemsInSection fires with count: \(self.arrayOfEvents.count)")
 
         return arrayOfEvents.count        
     }
@@ -161,7 +212,7 @@ class MainIPhoneCVC: UICollectionViewController {
             view.removeFromSuperview()
         }
         
-        let modelObject = arrayOfEvents[indexPath.row]
+        let modelObject = self.arrayOfEvents[indexPath.row]
         let newLabel = UILabel(frame: CGRectMake(0, 0, cell.contentView.frame.size.width, cell.contentView.frame.size.height))
         newLabel.text = modelObject.title
         cell.contentView.addSubview(newLabel)
