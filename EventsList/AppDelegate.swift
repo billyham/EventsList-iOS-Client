@@ -65,10 +65,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Test if subscription already exists
         let publicDatabase = CKContainer.defaultContainer().publicCloudDatabase
+        
+        //
+        let predicateTest = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
+        let query = CKQuery.init(recordType: "Program", predicate: predicateTest)
+        publicDatabase.performQuery(query, inZoneWithID: nil) { (arrayOfRecords, error) -> Void in
+            if error != nil {
+                print("Error is thrown making test request")
+            }else{
+                if arrayOfRecords != nil {
+                    print("count of test arrayOfRecords: \(arrayOfRecords!.count)")
+                }else{
+                    print("test array is nil")
+                }
+            }
+        }
+        //
+        
+        
         publicDatabase.fetchSubscriptionWithID("newProgram") { (subscription, error) -> Void in
             
             if (error) != nil{
                 print("error trying to retrieve subscriptions \(error)")
+                
+                publicDatabase.fetchAllSubscriptionsWithCompletionHandler({ (subscriptionArray, error) -> Void in
+                    if subscriptionArray != nil{
+                        print("count of subscriptions: \(subscriptionArray!.count)")
+                    }else{
+                        print("subscriptions array is nil")
+                    }
+                })
             }
             
             let secretValue: String = (NSUserDefaults.standardUserDefaults().objectForKey("firstDictionary")?.objectForKey("key"))! as! String
@@ -87,7 +113,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     CKSubscriptionOptions.FiresOnRecordDeletion).union(CKSubscriptionOptions.FiresOnRecordUpdate)
                 
                 let predicate = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
-                let subscription = CKSubscription.init(recordType: "Program", predicate: predicate, subscriptionID:"newProgram" , options: options)
+                let subscription = CKSubscription.init(recordType:"Program", predicate: predicate, subscriptionID:"newProgram88" , options: options)
                 
                 let notificationInfo = CKNotificationInfo.init()
                 notificationInfo.shouldBadge = true
@@ -96,7 +122,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 
                 subscription.notificationInfo = notificationInfo
                 
-                publicDatabase.saveSubscription(subscription) { (subscription, error) -> Void in
+                publicDatabase.saveSubscription(subscription) { (subscriptionResult, error) -> Void in
                     
                     if (error) != nil{
                         print("error at saving subscription: \(error)")
@@ -344,7 +370,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if ((error == nil)){
                 newMessages.append(record!)
             }else{
-                print("failed to get message with ID \(error)")
+                print("failed to get message with ID \(recordID)")
             }
         }
         
