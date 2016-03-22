@@ -81,24 +81,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 // Try looking at all subscriptions
                 publicDatabase.fetchAllSubscriptionsWithCompletionHandler({ (subscriptionArray, error) -> Void in
                     if subscriptionArray != nil{
+                        
                         var countOfSubs = subscriptionArray!.count
                         print("count of subscriptions: \(subscriptionArray!.count)")
                         
-                        for subscriptionItem in subscriptionArray! {
-                            publicDatabase.deleteSubscriptionWithID(subscriptionItem.subscriptionID, completionHandler: {(subscriptionID, error) -> Void in
-                                
-                                if error != nil{
-                                    print("Error attempting to delete subscriptionID: \(error))")
-                                }
-                                
-                                countOfSubs -= countOfSubs
-                                if countOfSubs < 1 {
-                                    self.createSubscription(application, publicDatabase: publicDatabase)
-                                }
-                                
-                            })
-                            print("this subscription: \(subscriptionItem)")
+                        if countOfSubs > 0 {
+                            
+                            for subscriptionItem in subscriptionArray! {
+                                publicDatabase.deleteSubscriptionWithID(subscriptionItem.subscriptionID, completionHandler: {(subscriptionID, error) -> Void in
+                                    
+                                    if error != nil{
+                                        print("Error attempting to delete subscriptionID: \(error))")
+                                    }
+                                    
+                                    countOfSubs -= countOfSubs
+                                    if countOfSubs < 1 {
+                                        self.createSubscription(application, publicDatabase: publicDatabase)
+                                    }
+                                    
+                                })
+                                print("this subscription: \(subscriptionItem)")
+                            }
+                        }else{
+                            
+                            self.createSubscription(application, publicDatabase: publicDatabase)
                         }
+                        
                     }else{
                         print("subscriptions array is nil")
                         
@@ -131,7 +139,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func createSubscription(application: UIApplication, publicDatabase: CKDatabase) {
         
         // Get all existing data in Programs (because a new subscription will pass over this data)
-        
         let predicateTest = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
         let query = CKQuery.init(recordType: "Program", predicate: predicateTest)
         publicDatabase.performQuery(query, inZoneWithID: nil) { (arrayOfRecords, error) -> Void in
@@ -185,6 +192,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 print("error at saving subscription: \(error)")
             }else{
                 NSUserDefaults.standardUserDefaults().setObject(["key": shortUUID], forKey: "firstDictionary")
+                
+                // #### Fetch Changed Records from CloudKit ####
+                self.queryForRecordIDs({ success in
+                    
+                })
             }
         }
 
@@ -220,7 +232,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let context = self.managedObjectContext
         
+        // Get existing CoreData records to ensure a duplicate entry is not added. 
+        var arrayOfExistingProgramModels = [String]()
+        let request = NSFetchRequest.init(entityName: "Program")
+        request.predicate = NSPredicate.init(format: "hideFromPublic == nil OR hideFromPublic == 0", argumentArray: nil)
+        
+        //execute the fetch and add to a new array
+        do {
+            let arrayResult = try context.executeFetchRequest(request)
+            for doodad in arrayResult{
+                let programThing = doodad as! Program
+                arrayOfExistingProgramModels.append(programThing.ckRecordName!)
+            }
+            
+        }catch{
+            print("AppDelegate > addPrograms failed to execcute fetch on coredata")
+        }
+        
+        var arrayOfFilteredCKRecords = [CKRecord]()
+        
         for record in arrayOfCKRecords {
+            
+            if let _ = arrayOfExistingProgramModels.indexOf(record.recordID.recordName) {
+                continue
+            }else{
+                arrayOfFilteredCKRecords.append(record)
+            }
             
             let programAddition = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
             programAddition.title = record.objectForKey("title") as? String
@@ -243,7 +280,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Refresh the collectionView
             let navigationController = self.window!.rootViewController as! UINavigationController
             let controller = navigationController.topViewController as! MainIPhoneCVC
-            controller.updateCollectionView(type: "Add", arrayOfChanged: arrayOfCKRecords)
+            controller.updateCollectionView(type: "Add", arrayOfChanged: arrayOfFilteredCKRecords)
             
         }catch{
             fatalError("Failure to save context: \(error)")
@@ -251,9 +288,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
     }
     
-    func deletePrograms(var arrayOfRecordIDs: [CKRecordID]?) {
+    func deletePrograms(arrayOfRecordIDs: [CKRecordID]?) {
         
         let context = self.managedObjectContext
+        
+        var arrayOfFinalRecordsIDs = [CKRecordID]()
         
         if arrayOfRecordIDs != nil{
             for recordID in arrayOfRecordIDs! {
@@ -266,18 +305,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     let arrayResult = try context.executeFetchRequest(request)
                     if arrayResult.count > 0{
                         context.deleteObject(arrayResult[0] as! NSManagedObject)
+                        arrayOfFinalRecordsIDs.append(recordID)
                     }
                 }catch{
                     print("Error trying to retrieve object to be deleted")
-                    arrayOfRecordIDs = nil
                 }
             }
+            
+            do {
+                try context.save()
+                
+                print("count of arrayOfFinalRecordIDs: \(arrayOfFinalRecordsIDs.count)")
+                
+                // Refresh the collectionView
+                let navigationController = self.window!.rootViewController as! UINavigationController
+                let controller = navigationController.topViewController as! MainIPhoneCVC
+                controller.deleteFromCollectionView(arrayOfFinalRecordsIDs)
+ 
+            }catch{
+                fatalError("Failure to save context on deletions: \(error)")
+            }
         }
-        
-        // Refresh the collectionView
-        let navigationController = self.window!.rootViewController as! UINavigationController
-        let controller = navigationController.topViewController as! MainIPhoneCVC
-        controller.deleteFromCollectionView(arrayOfRecordIDs)
     }
     
     func updatePrograms() {
@@ -344,6 +392,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if ((error) != nil) {
                 print("failed to fetch notification with \(error)")
                 completionHandler(success: false)
+                return
             }
             
             // Exit if the tokens are identitcal 

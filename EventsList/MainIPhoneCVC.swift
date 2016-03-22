@@ -176,6 +176,7 @@ class MainIPhoneCVC: UICollectionViewController {
             }
             
             if arrayOfIndexPaths.count > 0 {
+                print("count of newEvents: \(arrayOfNewEvents.count), count of self.arrayOfEvents: \(self.arrayOfEvents.count) and count of arrayOfChanged: \(arrayOfChanged!.count)")
                 self.arrayOfEvents = arrayOfNewEvents
                 self.collectionView!.deleteItemsAtIndexPaths(arrayOfIndexPaths)
             }
