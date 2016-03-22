@@ -66,70 +66,55 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Test if subscription already exists
         let publicDatabase = CKContainer.defaultContainer().publicCloudDatabase
         
-        //
-        let predicateTest = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
-        let query = CKQuery.init(recordType: "Program", predicate: predicateTest)
-        publicDatabase.performQuery(query, inZoneWithID: nil) { (arrayOfRecords, error) -> Void in
-            if error != nil {
-                print("Error is thrown making test request")
-            }else{
-                if arrayOfRecords != nil {
-                    print("count of test arrayOfRecords: \(arrayOfRecords!.count)")
-                }else{
-                    print("test array is nil")
-                }
-            }
-        }
-        //
+        // Get the unique subscriptionID from userDefaults
+        let secretValue: String = (NSUserDefaults.standardUserDefaults().objectForKey("firstDictionary")?.objectForKey("key"))! as! String
+        print("Here is the subscriptionID from userDefaults: \(secretValue)")
         
-        
-        publicDatabase.fetchSubscriptionWithID("newProgram") { (subscription, error) -> Void in
+        // Fetch the unique CKSubscription by name
+        publicDatabase.fetchSubscriptionWithID(secretValue) { (subscription, error) -> Void in
             
             if (error) != nil{
                 print("error trying to retrieve subscriptions \(error)")
                 
+                // ___!!!! After failing to retrieve the specified subscription, it should delete any existing subscriptions... !!!!____
+                
+                // Try looking at all subscriptions
                 publicDatabase.fetchAllSubscriptionsWithCompletionHandler({ (subscriptionArray, error) -> Void in
                     if subscriptionArray != nil{
+                        var countOfSubs = subscriptionArray!.count
                         print("count of subscriptions: \(subscriptionArray!.count)")
+                        
+                        for subscriptionItem in subscriptionArray! {
+                            publicDatabase.deleteSubscriptionWithID(subscriptionItem.subscriptionID, completionHandler: {(subscriptionID, error) -> Void in
+                                
+                                if error != nil{
+                                    print("Error attempting to delete subscriptionID: \(error))")
+                                }
+                                
+                                countOfSubs -= countOfSubs
+                                if countOfSubs < 1 {
+                                    self.createSubscription(application, publicDatabase: publicDatabase)
+                                }
+                                
+                            })
+                            print("this subscription: \(subscriptionItem)")
+                        }
                     }else{
                         print("subscriptions array is nil")
+                        
+                        if subscription == nil || secretValue == "someValue"{
+                            self.createSubscription(application, publicDatabase: publicDatabase)
+                        }
                     }
                 })
-            }
-            
-            let secretValue: String = (NSUserDefaults.standardUserDefaults().objectForKey("firstDictionary")?.objectForKey("key"))! as! String
-            
-            print("Here is the secretValue: \(secretValue)")
-            
-            if subscription == nil || secretValue == "someValue"{
+            }else{
                 
-                // Create subscription
+                // The correct subscription exists, query for changes
                 
-                let notificationSettings = UIUserNotificationSettings.init(forTypes: UIUserNotificationType.Alert, categories: nil)
-                application.registerUserNotificationSettings(notificationSettings)
-                application.registerForRemoteNotifications()
-                
-                let options = CKSubscriptionOptions.FiresOnRecordCreation.union(
-                    CKSubscriptionOptions.FiresOnRecordDeletion).union(CKSubscriptionOptions.FiresOnRecordUpdate)
-                
-                let predicate = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
-                let subscription = CKSubscription.init(recordType:"Program", predicate: predicate, subscriptionID:"newProgram88" , options: options)
-                
-                let notificationInfo = CKNotificationInfo.init()
-                notificationInfo.shouldBadge = true
-                notificationInfo.alertLocalizationKey = "Change to EventsList"
-                notificationInfo.shouldSendContentAvailable = true
-                
-                subscription.notificationInfo = notificationInfo
-                
-                publicDatabase.saveSubscription(subscription) { (subscriptionResult, error) -> Void in
+                // #### Fetch Changed Records from CloudKit ####
+                self.queryForRecordIDs({ success in
                     
-                    if (error) != nil{
-                        print("error at saving subscription: \(error)")
-                    }else{
-                        NSUserDefaults.standardUserDefaults().setObject(["key": "wrongValue"], forKey: "firstDictionary")
-                    }
-                }
+                })
             }
         }
         
@@ -138,13 +123,71 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let controller = navigationController.topViewController as! MainIPhoneCVC
         controller.myContext = self.managedObjectContext;
         
-        
-        // #### Fetch Changed Records from CloudKit ####
-        self.queryForRecordIDs({ success in
-        
-        })
-        
         return true
+    }
+    
+    
+    
+    func createSubscription(application: UIApplication, publicDatabase: CKDatabase) {
+        
+        // Get all existing data in Programs (because a new subscription will pass over this data)
+        
+        let predicateTest = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
+        let query = CKQuery.init(recordType: "Program", predicate: predicateTest)
+        publicDatabase.performQuery(query, inZoneWithID: nil) { (arrayOfRecords, error) -> Void in
+            if error != nil {
+                print("Error trying to download all existing Programs before assigning the subscription")
+            }else{
+                if arrayOfRecords != nil {
+                    print("count of test arrayOfRecords: \(arrayOfRecords!.count)")
+                    
+                    self.addPrograms(arrayOfRecords!)
+                    
+                }else{
+                    print("Array of Program data in nil")
+                }
+            }
+        }
+        
+        
+        // Create subscription
+        
+        
+        
+        // A unique subscription ID
+        let tempUUID = NSUUID.init().UUIDString
+        let stringIndex = tempUUID.startIndex.advancedBy(8)
+        let shortUUID = tempUUID.substringToIndex(stringIndex)
+        
+        // Register app for remote notifications
+        let notificationSettings = UIUserNotificationSettings.init(forTypes: UIUserNotificationType.Alert, categories: nil)
+        application.registerUserNotificationSettings(notificationSettings)
+        application.registerForRemoteNotifications()
+        
+        // Create subscription
+        let options = CKSubscriptionOptions.FiresOnRecordCreation.union(
+            CKSubscriptionOptions.FiresOnRecordDeletion).union(CKSubscriptionOptions.FiresOnRecordUpdate)
+        
+        let predicate = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
+        let subscription = CKSubscription.init(recordType:"Program", predicate: predicate, subscriptionID:shortUUID , options: options)
+        
+        // Notification on the subscription
+        let notificationInfo = CKNotificationInfo.init()
+        notificationInfo.shouldBadge = true
+        notificationInfo.alertLocalizationKey = "Change to EventsList"
+        notificationInfo.shouldSendContentAvailable = true
+        subscription.notificationInfo = notificationInfo
+        
+        // Attempt to save the subscription
+        publicDatabase.saveSubscription(subscription) { (subscriptionResult, error) -> Void in
+            
+            if (error) != nil{
+                print("error at saving subscription: \(error)")
+            }else{
+                NSUserDefaults.standardUserDefaults().setObject(["key": shortUUID], forKey: "firstDictionary")
+            }
+        }
+
     }
 
     func applicationWillResignActive(application: UIApplication) {
