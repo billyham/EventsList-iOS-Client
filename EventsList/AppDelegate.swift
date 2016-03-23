@@ -16,6 +16,7 @@ import CloudKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    var myContext: NSManagedObjectContext?
 
     func testZone(zoneString: String, completion:(result: Bool) -> Void) {
         
@@ -130,6 +131,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let navigationController = self.window!.rootViewController as! UINavigationController
         let controller = navigationController.topViewController as! MainIPhoneCVC
         controller.myContext = self.managedObjectContext;
+        self.myContext = controller.myContext
         
         return true
     }
@@ -230,7 +232,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func addPrograms(arrayOfCKRecords: [CKRecord]) {
         
-        let context = self.managedObjectContext
+        var context: NSManagedObjectContext
+        if self.myContext != nil{
+            context = self.myContext!
+        }else{
+            context = self.managedObjectContext
+        }
+        
+
         
         // Get existing CoreData records to ensure a duplicate entry is not added. 
         var arrayOfExistingProgramModels = [String]()
@@ -274,23 +283,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             programAddition.hideFromPublic = 0
         }
         
-        do {
-            try context.save()
-            
-            // Refresh the collectionView
-            let navigationController = self.window!.rootViewController as! UINavigationController
-            let controller = navigationController.topViewController as! MainIPhoneCVC
-            controller.updateCollectionView(type: "Add", arrayOfChanged: arrayOfFilteredCKRecords)
-            
-        }catch{
-            fatalError("Failure to save context: \(error)")
+        if context.hasChanges {
+            do {
+                try context.save()
+                
+                // Refresh the collectionView
+                let navigationController = self.window!.rootViewController as! UINavigationController
+                let controller = navigationController.topViewController as! MainIPhoneCVC
+                controller.updateCollectionView(type: "Add", arrayOfChanged: arrayOfFilteredCKRecords)
+                
+            }catch{
+                fatalError("Failure to save context: \(error)")
+            }
+        }else{
+            print("context says it has no changes to save")
         }
         
     }
     
     func deletePrograms(arrayOfRecordIDs: [CKRecordID]?) {
         
-        let context = self.managedObjectContext
+        var context: NSManagedObjectContext
+        if self.myContext != nil{
+            context = self.myContext!
+        }else{
+            context = self.managedObjectContext
+        }
         
         var arrayOfFinalRecordsIDs = [CKRecordID]()
         
@@ -330,7 +348,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func updatePrograms(arrayOfCKRecords: [CKRecord]) {
         
-        let context = self.managedObjectContext
+        var context: NSManagedObjectContext
+        if self.myContext != nil{
+            context = self.myContext!
+        }else{
+            context = self.managedObjectContext
+        }
         
         // Get matching coredata records to update
         var arrayOfExistingPrograms = [Program]()
@@ -362,7 +385,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 if ckItem.recordID.recordName == programItem.ckRecordName{
                     
                     // Update the record
-                    programItem.title = (ckItem.objectForKey("title") as! String)
+                    programItem.setValue((ckItem.objectForKey("title") as! String), forKey: "title")
                     
                     break
                 }
@@ -372,19 +395,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         print("Here is the mapped array: \(mappedArrayResult)")
         
-        for programItem in mappedArrayResult{
-            context.refreshObject(programItem, mergeChanges: true)
-        }
-        
-        do {
-            try context.save()
-            
-            let navigationController = self.window!.rootViewController as! UINavigationController
-            let controller = navigationController.topViewController as! MainIPhoneCVC
-            controller.updateCollectionView(type: "Update", arrayOfChanged: arrayOfCKRecords)
-            
-        }catch{
-            fatalError("Failure to save context: \(error)")
+        if context.hasChanges {
+            do {
+                try context.save()
+                                
+                let navigationController = self.window!.rootViewController as! UINavigationController
+                let controller = navigationController.topViewController as! MainIPhoneCVC
+                controller.updateCollectionView(type: "Update", arrayOfChanged: arrayOfCKRecords)
+                
+            }catch{
+                fatalError("Failure to save context: \(error)")
+            }
         }
     }
     
