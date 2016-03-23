@@ -235,7 +235,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Get existing CoreData records to ensure a duplicate entry is not added. 
         var arrayOfExistingProgramModels = [String]()
         let request = NSFetchRequest.init(entityName: "Program")
-        request.predicate = NSPredicate.init(format: "hideFromPublic == nil OR hideFromPublic == 0", argumentArray: nil)
+        request.predicate = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
         
         //execute the fetch and add to a new array
         do {
@@ -328,8 +328,64 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    func updatePrograms() {
+    func updatePrograms(arrayOfCKRecords: [CKRecord]) {
         
+        let context = self.managedObjectContext
+        
+        // Get matching coredata records to update
+        var arrayOfExistingPrograms = [Program]()
+        let request = NSFetchRequest.init(entityName: "Program")
+        request.predicate = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
+        
+        //execute the fetch
+        do {
+            arrayOfExistingPrograms = try context.executeFetchRequest(request) as! [Program]
+        }catch{
+            print("Failed coredata fetch")
+            return
+        }
+        
+        // Filter the fetch result array to just the items
+        let filteredArrayResult = arrayOfExistingPrograms.filter({ (programItem) -> Bool in
+            var boolValue = false
+            for ckItem in arrayOfCKRecords {
+                if ckItem.recordID.recordName == programItem.ckRecordName{
+                    boolValue = true
+                    break
+                }
+            }
+            return boolValue
+        })
+        
+        let mappedArrayResult = filteredArrayResult.map { (programItem) -> Program in
+            for ckItem in arrayOfCKRecords {
+                if ckItem.recordID.recordName == programItem.ckRecordName{
+                    
+                    // Update the record
+                    programItem.title = (ckItem.objectForKey("title") as! String)
+                    
+                    break
+                }
+            }
+            return programItem
+        }
+        
+        print("Here is the mapped array: \(mappedArrayResult)")
+        
+        for programItem in mappedArrayResult{
+            context.refreshObject(programItem, mergeChanges: true)
+        }
+        
+        do {
+            try context.save()
+            
+            let navigationController = self.window!.rootViewController as! UINavigationController
+            let controller = navigationController.topViewController as! MainIPhoneCVC
+            controller.updateCollectionView(type: "Update", arrayOfChanged: arrayOfCKRecords)
+            
+        }catch{
+            fatalError("Failure to save context: \(error)")
+        }
     }
     
 
@@ -405,45 +461,41 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self.previousChangeToken = serverChangeToken
             
             // #### 1. ADD new records ####
-            
-            self.queryMessagesWithIDs(newRecordIDs, completionHandler: { (messages, error) -> Void in
-                
-                if ((error) != nil){
-                    print("Error in queryMessagesWithIDs: \(error)")
-                    completionHandler(success: false)
-                }
-                
-                // Save CKRecords to CoreData
-                self.addPrograms(messages)
-                
-                for record in messages {
-                    print("Here is a new title: \(record.objectForKey("title"))")
+            if (newRecordIDs.count > 0) {
+                self.queryMessagesWithIDs(newRecordIDs, completionHandler: { (messages, error) -> Void in
+                    
+                    if ((error) != nil){
+                        print("Error in queryMessagesWithIDs: \(error)")
+                        completionHandler(success: false)
+                        return
+                    }
+                    
+                    // Save CKRecords to CoreData
+                    self.addPrograms(messages)
                     completionHandler(success: true)
-                }
-            })
+                })
+            }
             
             // #### 2. DELETE records ####
-            
             if deleteRecordIDs.count > 0 {
                 self.deletePrograms(deleteRecordIDs)
                 completionHandler(success: true)
             }
             
-            
             // #### 3. UPDATE existing records ####
-            
-            self.queryMessagesWithIDs(updateRecordIDs, completionHandler: { (messages, error) -> Void in
-                
-                if ((error) != nil){
-                    print("Error in queryMessagesWithIDs: \(error)")
-                    completionHandler(success: false)
-                }
-                
-                for record in messages {
-                    print("Here is an updated title: \(record.objectForKey("title"))")
+            if (updateRecordIDs.count > 0) {
+                self.queryMessagesWithIDs(updateRecordIDs, completionHandler: { (messages, error) -> Void in
+                    
+                    if ((error) != nil){
+                        print("Error in queryMessagesWithIDs: \(error)")
+                        completionHandler(success: false)
+                        return
+                    }
+                    
+                    self.updatePrograms(messages)
                     completionHandler(success: true)
-                }
-            })
+                })
+            }
             
         }
         

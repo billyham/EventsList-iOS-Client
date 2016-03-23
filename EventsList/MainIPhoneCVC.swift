@@ -107,6 +107,45 @@ class MainIPhoneCVC: UICollectionViewController {
                 fallthrough
             }
             
+        case "Update":
+            
+            print("updated array of ckRecoreds: \(arrayOfChanged)")
+            
+            if arrayOfChanged != nil {
+                
+//                var indexPathOld = NSIndexPath.init()
+//                var indexPathNew = NSIndexPath.init()
+//                
+//                for record in arrayOfChanged! {
+//                    
+//                    for i in 0..<arrayOfNewEvents.count {
+//                        
+//                        if record.recordID.recordName == arrayOfNewEvents[i].ckRecordName {
+//                            indexPathNew = NSIndexPath.init(forItem: i, inSection: 0)
+//                            break
+//                        }
+//                    }
+//                    
+//
+//                    for i in 0..<self.arrayOfEvents.count {
+//                        
+//                        if record.recordID.recordName == self.arrayOfEvents[i].ckRecordName {
+//                            indexPathOld = NSIndexPath.init(forItem: i, inSection: 0)
+//                            break
+//                        }
+//                    }
+//                    
+//                    self.collectionView?.moveItemAtIndexPath(indexPathOld, toIndexPath: indexPathNew)
+//                }
+                
+                fallthrough
+                
+            }else{
+                
+                fallthrough
+            }
+            
+            
         default:
             
             // #### Wholesale array replacement ####
@@ -126,6 +165,7 @@ class MainIPhoneCVC: UICollectionViewController {
                 }
                 
                 self.collectionView?.reloadData()
+                self.collectionView?.performSelector(Selector("reloadData"), withObject: nil, afterDelay: 1.0)
                 
                 //            arrayOfEvents.appendContentsOf(arrayResult as! Array)
             }catch let error as NSError{
