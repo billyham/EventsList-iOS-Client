@@ -45,7 +45,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 completion(result: true)
             }
         }
-        
     }
     
     
@@ -101,19 +100,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                     }
                                     
                                 })
-                                print("this subscription: \(subscriptionItem)")
                             }
                         }else{
                             
                             self.createSubscription(application, publicDatabase: publicDatabase)
                         }
-                        
                     }else{
-                        print("subscriptions array is nil")
                         
-                        if subscription == nil || secretValue == "someValue"{
-                            self.createSubscription(application, publicDatabase: publicDatabase)
-                        }
+                        self.createSubscription(application, publicDatabase: publicDatabase)
                     }
                 })
             }else{
@@ -137,7 +131,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     
-    
     func createSubscription(application: UIApplication, publicDatabase: CKDatabase) {
         
         // Get all existing data in Programs (because a new subscription will pass over this data)
@@ -148,7 +141,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 print("Error trying to download all existing Programs before assigning the subscription")
             }else{
                 if arrayOfRecords != nil {
-                    print("count of test arrayOfRecords: \(arrayOfRecords!.count)")
                     
                     self.addPrograms(arrayOfRecords!)
                     
@@ -160,8 +152,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         
         // Create subscription
-        
-        
         
         // A unique subscription ID
         let tempUUID = NSUUID.init().UUIDString
@@ -238,8 +228,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }else{
             context = self.managedObjectContext
         }
-        
-
         
         // Get existing CoreData records to ensure a duplicate entry is not added. 
         var arrayOfExistingProgramModels = [String]()
@@ -333,8 +321,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             do {
                 try context.save()
                 
-                print("count of arrayOfFinalRecordIDs: \(arrayOfFinalRecordsIDs.count)")
-                
                 // Refresh the collectionView
                 let navigationController = self.window!.rootViewController as! UINavigationController
                 let controller = navigationController.topViewController as! MainIPhoneCVC
@@ -380,20 +366,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return boolValue
         })
         
-        let mappedArrayResult = filteredArrayResult.map { (programItem) -> Program in
+        // ___!!!!  Map? Or loop? !!!!____
+        _ = filteredArrayResult.map { (programItem) -> Program in
             for ckItem in arrayOfCKRecords {
                 if ckItem.recordID.recordName == programItem.ckRecordName{
                     
                     // Update the record
                     programItem.setValue((ckItem.objectForKey("title") as! String), forKey: "title")
                     
+                    // Save updated CKRecord System properties
+                    let archivedData = NSMutableData()
+                    let archiver = NSKeyedArchiver(forWritingWithMutableData: archivedData)
+                    archiver.requiresSecureCoding = true
+                    ckItem.encodeSystemFieldsWithCoder(archiver)
+                    archiver.finishEncoding()
+                    programItem.ckRecord = archivedData
+                    
                     break
                 }
             }
             return programItem
         }
-        
-        print("Here is the mapped array: \(mappedArrayResult)")
         
         if context.hasChanges {
             do {
@@ -439,9 +432,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var newRecordIDs = [CKRecordID]()
         var deleteRecordIDs = [CKRecordID]()
         var updateRecordIDs = [CKRecordID]()
-        
-        //        print("this is the notificationChangesOperation: \(notificationChangesOperation)")
-        
         
         notificationChangesOperation.notificationChangedBlock = {notification in
             
@@ -521,7 +511,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         CKContainer.defaultContainer().addOperation(notificationChangesOperation)
-        
     }
     
     

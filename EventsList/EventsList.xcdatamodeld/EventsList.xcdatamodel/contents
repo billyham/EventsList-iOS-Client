@@ -6,7 +6,7 @@
         <attribute name="dateStart" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="hideFromPublic" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="live" optional="YES" attributeType="Boolean" syncable="YES"/>
-        <relationship name="programRef" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Program" syncable="YES"/>
+        <relationship name="programRef" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Program" inverseName="dateRef" inverseEntity="Program" syncable="YES"/>
     </entity>
     <entity name="Program" representedClassName=".Program" syncable="YES">
         <attribute name="ckRecord" optional="YES" attributeType="Binary" syncable="YES"/>
@@ -25,10 +25,11 @@
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="venue" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="video" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="dateRef" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Date" inverseName="programRef" inverseEntity="Date" syncable="YES"/>
     </entity>
     <fetchRequest name="programsPublic" entity="Program" predicateString="hideFromPublic != 1"/>
     <elements>
-        <element name="Date" positionX="-54" positionY="-9" width="128" height="135"/>
-        <element name="Program" positionX="-63" positionY="-18" width="128" height="285"/>
+        <element name="Date" positionX="99" positionY="0" width="128" height="133"/>
+        <element name="Program" positionX="-63" positionY="-18" width="128" height="298"/>
     </elements>
 </model>
