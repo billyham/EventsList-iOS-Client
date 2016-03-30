@@ -23,6 +23,8 @@
 		54F4ED681C86CBFC0031A9BB /* MainIPhoneCVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED671C86CBFC0031A9BB /* MainIPhoneCVC.swift */; };
 		54F4ED6A1C86CCF20031A9BB /* ProgramModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED691C86CCF20031A9BB /* ProgramModel.swift */; };
 		54F4ED6C1C86CD5E0031A9BB /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED6B1C86CD5E0031A9BB /* DataSource.swift */; };
+		54FD40D51CABCE8E0042DB23 /* ProgramCVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54FD40D31CABCE8E0042DB23 /* ProgramCVCell.swift */; };
+		54FD40D61CABCE8E0042DB23 /* ProgramCVCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 54FD40D41CABCE8E0042DB23 /* ProgramCVCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +68,8 @@
 		54F4ED671C86CBFC0031A9BB /* MainIPhoneCVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainIPhoneCVC.swift; sourceTree = "<group>"; };
 		54F4ED691C86CCF20031A9BB /* ProgramModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgramModel.swift; sourceTree = "<group>"; };
 		54F4ED6B1C86CD5E0031A9BB /* DataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
+		54FD40D31CABCE8E0042DB23 /* ProgramCVCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgramCVCell.swift; sourceTree = "<group>"; };
+		54FD40D41CABCE8E0042DB23 /* ProgramCVCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProgramCVCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,10 +135,12 @@
 			children = (
 				016591701C935859001EA073 /* EventsList.entitlements */,
 				54F4ED341C86C9C20031A9BB /* AppDelegate.swift */,
-				54F4ED381C86C9C20031A9BB /* Main.storyboard */,
 				54F4ED671C86CBFC0031A9BB /* MainIPhoneCVC.swift */,
+				54F4ED381C86C9C20031A9BB /* Main.storyboard */,
 				54F4ED651C86CA890031A9BB /* MainIPad.storyboard */,
 				54F4ED401C86C9C20031A9BB /* LaunchScreen.storyboard */,
+				54FD40D31CABCE8E0042DB23 /* ProgramCVCell.swift */,
+				54FD40D41CABCE8E0042DB23 /* ProgramCVCell.xib */,
 				54F4ED3E1C86C9C20031A9BB /* Assets.xcassets */,
 				54F4ED431C86C9C20031A9BB /* Info.plist */,
 				54F4ED3B1C86C9C20031A9BB /* EventsList.xcdatamodeld */,
@@ -279,6 +285,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				54FD40D61CABCE8E0042DB23 /* ProgramCVCell.xib in Resources */,
 				54F4ED421C86C9C20031A9BB /* LaunchScreen.storyboard in Resources */,
 				54F4ED661C86CA890031A9BB /* MainIPad.storyboard in Resources */,
 				54F4ED3F1C86C9C20031A9BB /* Assets.xcassets in Resources */,
@@ -312,6 +319,7 @@
 				54F4ED6C1C86CD5E0031A9BB /* DataSource.swift in Sources */,
 				0165917A1C9397F0001EA073 /* Date+CoreDataProperties.swift in Sources */,
 				54F4ED351C86C9C20031A9BB /* AppDelegate.swift in Sources */,
+				54FD40D51CABCE8E0042DB23 /* ProgramCVCell.swift in Sources */,
 				54F4ED681C86CBFC0031A9BB /* MainIPhoneCVC.swift in Sources */,
 				54F4ED6A1C86CCF20031A9BB /* ProgramModel.swift in Sources */,
 				54F4ED3D1C86C9C20031A9BB /* EventsList.xcdatamodeld in Sources */,
@@ -462,6 +470,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = EventsList/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "David-Vincent-Hanagan.EventsList";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -480,6 +489,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = EventsList/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "David-Vincent-Hanagan.EventsList";
 				PRODUCT_NAME = "$(TARGET_NAME)";

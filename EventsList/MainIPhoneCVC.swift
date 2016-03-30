@@ -27,7 +27,7 @@ class MainIPhoneCVC: UICollectionViewController {
         // self.clearsSelectionOnViewWillAppear = false
 
         // Register cell classes
-        self.collectionView!.registerClass(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+        self.collectionView!.registerClass(ProgramCVCell.self, forCellWithReuseIdentifier: reuseIdentifier)
 
         // Initially populate array with content and present collection view
         self.updateCollectionView(type: "Add", arrayOfChanged: nil)
@@ -215,6 +215,59 @@ class MainIPhoneCVC: UICollectionViewController {
         }
     }
     
+    
+    // MARK: - Responding to orientation changes
+    
+    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        
+        // Force a layout refresh
+        self.collectionView?.collectionViewLayout.invalidateLayout()
+        
+        let widthValue = size.width
+        if widthValue < 400 {
+            print("Rotated to portrait")
+        }else{
+            print("Rotated to landscape")
+        }
+        
+        // OK, sure, this. Un huh
+        coordinator.animateAlongsideTransition(nil) { (context) in
+            
+            // Scroll to top
+            self.collectionView!.scrollToItemAtIndexPath(NSIndexPath.init(forRow: 0, inSection: 0), atScrollPosition: UICollectionViewScrollPosition.Top, animated: false)
+            
+            // Force loading the cells in view
+            // What the hell!!!!
+            self.collectionView!.reloadData()
+        }
+        
+        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+    }
+    
+//    override func viewWillLayoutSubviews() {
+//        
+//    }
+//    
+//    override func viewDidLayoutSubviews() {
+//
+//    }
+    
+    
+    // MARK: - Flow Layout Delegate methods
+    
+    func collectionView(collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                               sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize{
+        
+        if self.collectionView!.frame.size.width < 400 {
+            return CGSize.init(width: self.collectionView!.frame.size.width, height: 44.0)
+        }else{
+            let widthFraction = self.collectionView!.frame.size.width / 5.0
+            return CGSize.init(width: widthFraction, height: widthFraction)
+        }
+        
+    }
+    
 
     // MARK: - UICollectionViewDataSource
 
@@ -230,6 +283,7 @@ class MainIPhoneCVC: UICollectionViewController {
     }
 
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+        
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath)
     
         // Configure the cell
@@ -241,7 +295,9 @@ class MainIPhoneCVC: UICollectionViewController {
         let newLabel = UILabel(frame: CGRectMake(0, 0, cell.contentView.frame.size.width, cell.contentView.frame.size.height))
         newLabel.text = modelObject.title
         cell.contentView.addSubview(newLabel)
-            
+        
+        cell.contentView.clipsToBounds = true
+        
         return cell
     }
 

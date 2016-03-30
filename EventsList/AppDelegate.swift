@@ -68,6 +68,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Get the unique subscriptionID from userDefaults
         let secretValue: String = (NSUserDefaults.standardUserDefaults().objectForKey("firstDictionary")?.objectForKey("key"))! as! String
+        
         print("Here is the subscriptionID from userDefaults: \(secretValue)")
         
         // Fetch the unique CKSubscription by name
@@ -154,43 +155,66 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Create subscription
         
         // A unique subscription ID
-        let tempUUID = NSUUID.init().UUIDString
-        let stringIndex = tempUUID.startIndex.advancedBy(8)
-        let shortUUID = tempUUID.substringToIndex(stringIndex)
         
-        // Register app for remote notifications
-        let notificationSettings = UIUserNotificationSettings.init(forTypes: UIUserNotificationType.Alert, categories: nil)
-        application.registerUserNotificationSettings(notificationSettings)
-        application.registerForRemoteNotifications()
+        //__1__
+//        let tempUUID = NSUUID.init().UUIDString
+//        let stringIndex = tempUUID.startIndex.advancedBy(8)
+//        let shortUUID = tempUUID.substringToIndex(stringIndex)
         
-        // Create subscription
-        let options = CKSubscriptionOptions.FiresOnRecordCreation.union(
-            CKSubscriptionOptions.FiresOnRecordDeletion).union(CKSubscriptionOptions.FiresOnRecordUpdate)
-        
-        let predicate = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
-        let subscription = CKSubscription.init(recordType:"Program", predicate: predicate, subscriptionID:shortUUID , options: options)
-        
-        // Notification on the subscription
-        let notificationInfo = CKNotificationInfo.init()
-        notificationInfo.shouldBadge = true
-        notificationInfo.alertLocalizationKey = "Change to EventsList"
-        notificationInfo.shouldSendContentAvailable = true
-        subscription.notificationInfo = notificationInfo
-        
-        // Attempt to save the subscription
-        publicDatabase.saveSubscription(subscription) { (subscriptionResult, error) -> Void in
+        //__2__
+        CKContainer.defaultContainer().fetchUserRecordIDWithCompletionHandler { (recordID, error) in
             
-            if (error) != nil{
-                print("error at saving subscription: \(error)")
-            }else{
-                NSUserDefaults.standardUserDefaults().setObject(["key": shortUUID], forKey: "firstDictionary")
+            if error != nil{
+               print("error trying to access user recordID \(error?.localizedDescription)")
                 
-                // #### Fetch Changed Records from CloudKit ####
-                self.queryForRecordIDs({ success in
+            }else{
+                
+                let tempUUID = recordID!.recordName
+                let stringIndex = tempUUID.startIndex.advancedBy(1)
+                let shortUUID = tempUUID.substringFromIndex(stringIndex)
+                print("this is the user record name: \(shortUUID)")
+
+                
+                // Register app for remote notifications
+                let notificationSettings = UIUserNotificationSettings.init(forTypes: UIUserNotificationType.Alert, categories: nil)
+                application.registerUserNotificationSettings(notificationSettings)
+                application.registerForRemoteNotifications()
+                
+                // Create subscription
+                let options = CKSubscriptionOptions.FiresOnRecordCreation.union(
+                    CKSubscriptionOptions.FiresOnRecordDeletion).union(CKSubscriptionOptions.FiresOnRecordUpdate)
+                
+                let predicate = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
+                let subscription = CKSubscription.init(recordType:"Program", predicate: predicate, subscriptionID:shortUUID , options: options)
+                
+                // Notification on the subscription
+                let notificationInfo = CKNotificationInfo.init()
+                notificationInfo.shouldBadge = true
+                notificationInfo.alertLocalizationKey = "Change to EventsList"
+                notificationInfo.shouldSendContentAvailable = true
+                subscription.notificationInfo = notificationInfo
+                
+                // Attempt to save the subscription
+                publicDatabase.saveSubscription(subscription) { (subscriptionResult, error) -> Void in
                     
-                })
+                    if (error) != nil{
+                        print("error at saving subscription: \(error)")
+                    }else{
+                        NSUserDefaults.standardUserDefaults().setObject(["key": shortUUID], forKey: "firstDictionary")
+                        
+                        // #### Fetch Changed Records from CloudKit ####
+                        self.queryForRecordIDs({ success in
+                            
+                        })
+                    }
+                }
+                
             }
+            
         }
+        
+        
+ 
 
     }
 
