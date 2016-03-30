@@ -27,7 +27,8 @@ class MainIPhoneCVC: UICollectionViewController {
         // self.clearsSelectionOnViewWillAppear = false
 
         // Register cell classes
-        self.collectionView!.registerClass(ProgramCVCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+//        self.collectionView!.registerClass(ProgramCVCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+        self.collectionView!.registerNib(UINib.init(nibName: "ProgramCVCell", bundle: nil), forCellWithReuseIdentifier: "Cell")
 
         // Initially populate array with content and present collection view
         self.updateCollectionView(type: "Add", arrayOfChanged: nil)
@@ -95,7 +96,9 @@ class MainIPhoneCVC: UICollectionViewController {
                 
                 if arrayOfIndexPaths.count > 0 {
                     self.arrayOfEvents = arrayOfNewEvents
-                    self.collectionView!.insertItemsAtIndexPaths(arrayOfIndexPaths)
+                    dispatch_async(dispatch_get_main_queue(), {
+                        self.collectionView!.insertItemsAtIndexPaths(arrayOfIndexPaths)
+                    })
                 }
                 
             }else{
@@ -129,8 +132,10 @@ class MainIPhoneCVC: UICollectionViewController {
                     }
                     
                     self.arrayOfEvents = arrayOfNewEvents
-                    self.collectionView?.moveItemAtIndexPath(indexPathOld, toIndexPath: indexPathNew)
-                    self.collectionView?.reloadItemsAtIndexPaths([indexPathNew])
+                    dispatch_async(dispatch_get_main_queue(), {
+                        self.collectionView?.moveItemAtIndexPath(indexPathOld, toIndexPath: indexPathNew)
+                        self.collectionView?.reloadItemsAtIndexPaths([indexPathNew])
+                    })
                 }
                 
             }else{
@@ -154,8 +159,9 @@ class MainIPhoneCVC: UICollectionViewController {
                         self.arrayOfEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: newObject.ckRecordName!))
                     }
                 }
-                
-                self.collectionView?.reloadData()
+                dispatch_async(dispatch_get_main_queue(), {
+                    self.collectionView?.reloadData()
+                })
                 
             }catch let error as NSError{
                 print("Failed to execute CoreData fetch: \(error)")
@@ -203,7 +209,10 @@ class MainIPhoneCVC: UICollectionViewController {
             
             if arrayOfIndexPaths.count > 0 {
                 self.arrayOfEvents = arrayOfNewEvents
-                self.collectionView!.deleteItemsAtIndexPaths(arrayOfIndexPaths)
+                dispatch_async(dispatch_get_main_queue(), {
+                    self.collectionView!.deleteItemsAtIndexPaths(arrayOfIndexPaths)
+                })
+                
             }
             
         }else{
@@ -260,7 +269,7 @@ class MainIPhoneCVC: UICollectionViewController {
                                sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize{
         
         if self.collectionView!.frame.size.width < 400 {
-            return CGSize.init(width: self.collectionView!.frame.size.width, height: 44.0)
+            return CGSize.init(width: self.collectionView!.frame.size.width, height: 50.0)
         }else{
             let widthFraction = self.collectionView!.frame.size.width / 5.0
             return CGSize.init(width: widthFraction, height: widthFraction)
@@ -284,17 +293,11 @@ class MainIPhoneCVC: UICollectionViewController {
 
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath)
-    
-        // Configure the cell
-        for view in cell.contentView.subviews{
-            view.removeFromSuperview()
-        }
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! ProgramCVCell
         
         let modelObject = self.arrayOfEvents[indexPath.row]
-        let newLabel = UILabel(frame: CGRectMake(0, 0, cell.contentView.frame.size.width, cell.contentView.frame.size.height))
-        newLabel.text = modelObject.title
-        cell.contentView.addSubview(newLabel)
+        
+        cell.assignValues(modelObject.title)
         
         cell.contentView.clipsToBounds = true
         

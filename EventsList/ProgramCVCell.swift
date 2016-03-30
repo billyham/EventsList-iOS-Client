@@ -10,9 +10,17 @@ import UIKit
 
 class ProgramCVCell: UICollectionViewCell {
 
+    @IBOutlet weak var titleLabel: UILabel?
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+    }
+    
+    internal func assignValues(title: String){
+        if titleLabel != nil{
+            titleLabel!.text = title
+        }
     }
 
 }

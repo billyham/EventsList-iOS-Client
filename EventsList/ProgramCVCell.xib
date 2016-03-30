@@ -24,10 +24,18 @@
                                     <constraint firstAttribute="width" secondItem="Hfe-lP-srd" secondAttribute="height" multiplier="1:1" id="4sl-LG-s1L"/>
                                 </constraints>
                             </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TWa-Rp-gmp" userLabel="Title">
+                                <rect key="frame" x="122" y="46" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" red="0.82703793459999997" green="0.93223852039999999" blue="0.90891247419999999" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
+                            <constraint firstItem="TWa-Rp-gmp" firstAttribute="centerY" secondItem="QFo-dW-tij" secondAttribute="centerY" id="DAq-sf-h59"/>
                             <constraint firstAttribute="bottom" secondItem="Hfe-lP-srd" secondAttribute="bottom" id="ica-hl-TfL"/>
+                            <constraint firstItem="TWa-Rp-gmp" firstAttribute="leading" secondItem="Hfe-lP-srd" secondAttribute="trailing" constant="8" id="pdP-Yc-CDq"/>
                             <constraint firstItem="Hfe-lP-srd" firstAttribute="leading" secondItem="QFo-dW-tij" secondAttribute="leading" id="vHS-lE-Mou"/>
                             <constraint firstItem="Hfe-lP-srd" firstAttribute="top" secondItem="QFo-dW-tij" secondAttribute="top" id="xC2-Gi-e7t"/>
                         </constraints>
@@ -42,7 +50,10 @@
                 <constraint firstItem="QFo-dW-tij" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="wgV-Lu-lXk"/>
             </constraints>
             <size key="customSize" width="259" height="95"/>
-            <point key="canvasLocation" x="206.5" y="399.5"/>
+            <connections>
+                <outlet property="titleLabel" destination="TWa-Rp-gmp" id="gTZ-VJ-JLC"/>
+            </connections>
+            <point key="canvasLocation" x="206.5" y="399"/>
         </collectionViewCell>
     </objects>
 </document>
