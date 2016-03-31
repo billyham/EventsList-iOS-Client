@@ -53,7 +53,7 @@ class MainIPhoneCVC: UICollectionViewController {
             
             for object in arrayResult!{
                 let newObject = object as! Program
-                arrayOfNewEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: newObject.ckRecordName!))
+                arrayOfNewEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: newObject.ckRecordName!, image440: newObject.image440Name))
             }
             
         }catch let error as NSError{
@@ -156,7 +156,7 @@ class MainIPhoneCVC: UICollectionViewController {
                 for object in arrayResult!{
                     if object.title != nil{
                         let newObject = object as! Program
-                        self.arrayOfEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: newObject.ckRecordName!))
+                        self.arrayOfEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: newObject.ckRecordName!, image440: newObject.image440Name))
                     }
                 }
                 dispatch_async(dispatch_get_main_queue(), {
@@ -185,7 +185,7 @@ class MainIPhoneCVC: UICollectionViewController {
             
             for object in arrayResult!{
                 let newObject = object as! Program
-                arrayOfNewEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: newObject.ckRecordName!))
+                arrayOfNewEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: newObject.ckRecordName!, image440: newObject.image440Name))
             }
             
         }catch let error as NSError{
@@ -220,7 +220,9 @@ class MainIPhoneCVC: UICollectionViewController {
             // #### Wholesale array replacement ####
             
             self.arrayOfEvents = arrayOfNewEvents
-            self.collectionView?.reloadData()
+            dispatch_async(dispatch_get_main_queue(), {
+                self.collectionView?.reloadData()
+            })
         }
     }
     
@@ -269,7 +271,7 @@ class MainIPhoneCVC: UICollectionViewController {
                                sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize{
         
         if self.collectionView!.frame.size.width < 400 {
-            return CGSize.init(width: self.collectionView!.frame.size.width, height: 50.0)
+            return CGSize.init(width: self.collectionView!.frame.size.width, height: 65.0)
         }else{
             let widthFraction = self.collectionView!.frame.size.width / 5.0
             return CGSize.init(width: widthFraction, height: widthFraction)
@@ -294,12 +296,20 @@ class MainIPhoneCVC: UICollectionViewController {
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! ProgramCVCell
+        cell.contentView.clipsToBounds = true
         
         let modelObject = self.arrayOfEvents[indexPath.row]
+        cell.assignValues(modelObject.title, image440: modelObject.image440)
         
-        cell.assignValues(modelObject.title)
+        // If modelObject has a value for image440Name, go get the image
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) {
+            
+            modelObject.retrieveImage440(modelObject.image440) { (image) in
+                
+                // !!!!____ Do something with the returned UIImage ____!!!!
+            }
+        }
         
-        cell.contentView.clipsToBounds = true
         
         return cell
     }

@@ -11,16 +11,19 @@ import UIKit
 class ProgramCVCell: UICollectionViewCell {
 
     @IBOutlet weak var titleLabel: UILabel?
+    @IBOutlet weak var imageRefLabel: UILabel?
     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
     }
     
-    internal func assignValues(title: String){
+    internal func assignValues(title: String, image440: String?){
         if titleLabel != nil{
             titleLabel!.text = title
         }
+        
+        imageRefLabel?.text = image440
     }
 
 }

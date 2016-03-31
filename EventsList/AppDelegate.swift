@@ -285,16 +285,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             
             let programAddition = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
-            programAddition.title = record.objectForKey("title") as? String
-            programAddition.ckRecordName = record.recordID.recordName
             
-            // Save CKRecord System properties to managed object
-            let archivedData = NSMutableData()
-            let archiver = NSKeyedArchiver(forWritingWithMutableData: archivedData)
-            archiver.requiresSecureCoding = true
-            record.encodeSystemFieldsWithCoder(archiver)
-            archiver.finishEncoding()
-            programAddition.ckRecord = archivedData
+            self.mutateProgramWithCKRecord(programAddition, record: record, context: context)
             
             programAddition.hideFromPublic = 0
         }
@@ -316,6 +308,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
     }
+    
+
     
     func deletePrograms(arrayOfRecordIDs: [CKRecordID]?) {
         
@@ -400,15 +394,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 if ckItem.recordID.recordName == programItem.ckRecordName{
                     
                     // Update the record
-                    programItem.setValue((ckItem.objectForKey("title") as! String), forKey: "title")
-                    
-                    // Save updated CKRecord System properties
-                    let archivedData = NSMutableData()
-                    let archiver = NSKeyedArchiver(forWritingWithMutableData: archivedData)
-                    archiver.requiresSecureCoding = true
-                    ckItem.encodeSystemFieldsWithCoder(archiver)
-                    archiver.finishEncoding()
-                    programItem.ckRecord = archivedData
+                    self.mutateProgramWithCKRecord(programItem, record: ckItem, context: context)
                     
                     break
                 }
@@ -428,6 +414,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 fatalError("Failure to save context: \(error)")
             }
         }
+    }
+    
+    func mutateProgramWithCKRecord(programAddition: Program, record: CKRecord, context: NSManagedObjectContext) -> Void {
+        
+        programAddition.title = record.objectForKey("title") as? String
+        programAddition.ckRecordName = record.recordID.recordName
+        programAddition.image440Name = record.objectForKey("imageRef") as? String
+        
+        if let tempRecord: CKReference = record.objectForKey("imageRef") as? CKReference{
+            programAddition.image440Name = tempRecord.recordID.recordName
+        }
+        
+        // Save CKRecord System properties to managed object
+        let archivedData = NSMutableData()
+        let archiver = NSKeyedArchiver(forWritingWithMutableData: archivedData)
+        archiver.requiresSecureCoding = true
+        record.encodeSystemFieldsWithCoder(archiver)
+        archiver.finishEncoding()
+        programAddition.ckRecord = archivedData
     }
     
 
@@ -593,6 +598,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
     }
+    
     
     // MARK: - Core Data stack
 

@@ -2,7 +2,7 @@
 //  Program+CoreDataProperties.swift
 //  EventsList
 //
-//  Created by Ray Smith on 3/17/16.
+//  Created by Ray Smith on 3/30/16.
 //  Copyright © 2016 Hamagain LLC. All rights reserved.
 //
 //  Choose "Create NSManagedObject Subclass…" from the Core Data editor menu
@@ -14,6 +14,8 @@ import CoreData
 
 extension Program {
 
+    @NSManaged var ckRecord: NSData?
+    @NSManaged var ckRecordName: String?
     @NSManaged var classInfo: String?
     @NSManaged var dateEnd: NSDate?
     @NSManaged var dateStart: NSDate?
@@ -28,7 +30,8 @@ extension Program {
     @NSManaged var title: String?
     @NSManaged var venue: String?
     @NSManaged var video: String?
-    @NSManaged var ckRecordName: String?
-    @NSManaged var ckRecord: NSData?
+    @NSManaged var image440Name: String?
+    @NSManaged var image440Ref: NSData?
+    @NSManaged var dateRef: NSSet?
 
 }

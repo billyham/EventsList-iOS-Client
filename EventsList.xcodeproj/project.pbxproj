@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		016591721C935867001EA073 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 016591711C935867001EA073 /* CloudKit.framework */; };
-		016591781C9397F0001EA073 /* Program+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016591741C9397F0001EA073 /* Program+CoreDataProperties.swift */; };
-		016591791C9397F0001EA073 /* Program.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016591751C9397F0001EA073 /* Program.swift */; };
 		0165917A1C9397F0001EA073 /* Date+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016591761C9397F0001EA073 /* Date+CoreDataProperties.swift */; };
 		0165917B1C9397F0001EA073 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016591771C9397F0001EA073 /* Date.swift */; };
 		54F4ED351C86C9C20031A9BB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED341C86C9C20031A9BB /* AppDelegate.swift */; };
@@ -25,6 +23,8 @@
 		54F4ED6C1C86CD5E0031A9BB /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4ED6B1C86CD5E0031A9BB /* DataSource.swift */; };
 		54FD40D51CABCE8E0042DB23 /* ProgramCVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54FD40D31CABCE8E0042DB23 /* ProgramCVCell.swift */; };
 		54FD40D61CABCE8E0042DB23 /* ProgramCVCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 54FD40D41CABCE8E0042DB23 /* ProgramCVCell.xib */; };
+		54FD40DA1CACEA760042DB23 /* Program.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54FD40D81CACEA760042DB23 /* Program.swift */; };
+		54FD40DC1CACF3530042DB23 /* Program+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54FD40DB1CACF3530042DB23 /* Program+CoreDataProperties.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,8 +47,6 @@
 /* Begin PBXFileReference section */
 		016591701C935859001EA073 /* EventsList.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = EventsList.entitlements; sourceTree = "<group>"; };
 		016591711C935867001EA073 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
-		016591741C9397F0001EA073 /* Program+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Program+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		016591751C9397F0001EA073 /* Program.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Program.swift; sourceTree = "<group>"; };
 		016591761C9397F0001EA073 /* Date+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		016591771C9397F0001EA073 /* Date.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
 		54F4ED311C86C9C20031A9BB /* EventsList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EventsList.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -70,6 +68,8 @@
 		54F4ED6B1C86CD5E0031A9BB /* DataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
 		54FD40D31CABCE8E0042DB23 /* ProgramCVCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgramCVCell.swift; sourceTree = "<group>"; };
 		54FD40D41CABCE8E0042DB23 /* ProgramCVCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProgramCVCell.xib; sourceTree = "<group>"; };
+		54FD40D81CACEA760042DB23 /* Program.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Program.swift; sourceTree = "<group>"; };
+		54FD40DB1CACF3530042DB23 /* Program+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Program+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,8 +101,8 @@
 		016591731C9397A2001EA073 /* NSManangedObject subclasses */ = {
 			isa = PBXGroup;
 			children = (
-				016591741C9397F0001EA073 /* Program+CoreDataProperties.swift */,
-				016591751C9397F0001EA073 /* Program.swift */,
+				54FD40DB1CACF3530042DB23 /* Program+CoreDataProperties.swift */,
+				54FD40D81CACEA760042DB23 /* Program.swift */,
 				016591761C9397F0001EA073 /* Date+CoreDataProperties.swift */,
 				016591771C9397F0001EA073 /* Date.swift */,
 			);
@@ -314,16 +314,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				016591791C9397F0001EA073 /* Program.swift in Sources */,
+				54FD40DA1CACEA760042DB23 /* Program.swift in Sources */,
 				0165917B1C9397F0001EA073 /* Date.swift in Sources */,
 				54F4ED6C1C86CD5E0031A9BB /* DataSource.swift in Sources */,
 				0165917A1C9397F0001EA073 /* Date+CoreDataProperties.swift in Sources */,
+				54FD40DC1CACF3530042DB23 /* Program+CoreDataProperties.swift in Sources */,
 				54F4ED351C86C9C20031A9BB /* AppDelegate.swift in Sources */,
 				54FD40D51CABCE8E0042DB23 /* ProgramCVCell.swift in Sources */,
 				54F4ED681C86CBFC0031A9BB /* MainIPhoneCVC.swift in Sources */,
 				54F4ED6A1C86CCF20031A9BB /* ProgramModel.swift in Sources */,
 				54F4ED3D1C86C9C20031A9BB /* EventsList.xcdatamodeld in Sources */,
-				016591781C9397F0001EA073 /* Program+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

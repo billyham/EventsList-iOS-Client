@@ -27,15 +27,26 @@
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TWa-Rp-gmp" userLabel="Title">
                                 <rect key="frame" x="122" y="46" width="42" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="t4H-1z-Uxv">
+                                <rect key="frame" x="122" y="75" width="0.0" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="N89-Df-uit"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
                         <color key="backgroundColor" red="0.82703793459999997" green="0.93223852039999999" blue="0.90891247419999999" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="TWa-Rp-gmp" firstAttribute="centerY" secondItem="QFo-dW-tij" secondAttribute="centerY" id="DAq-sf-h59"/>
+                            <constraint firstItem="t4H-1z-Uxv" firstAttribute="leading" secondItem="Hfe-lP-srd" secondAttribute="trailing" constant="8" id="Wyk-aH-qq9"/>
                             <constraint firstAttribute="bottom" secondItem="Hfe-lP-srd" secondAttribute="bottom" id="ica-hl-TfL"/>
                             <constraint firstItem="TWa-Rp-gmp" firstAttribute="leading" secondItem="Hfe-lP-srd" secondAttribute="trailing" constant="8" id="pdP-Yc-CDq"/>
+                            <constraint firstItem="t4H-1z-Uxv" firstAttribute="top" secondItem="TWa-Rp-gmp" secondAttribute="bottom" constant="8" id="sh1-6R-okX"/>
                             <constraint firstItem="Hfe-lP-srd" firstAttribute="leading" secondItem="QFo-dW-tij" secondAttribute="leading" id="vHS-lE-Mou"/>
                             <constraint firstItem="Hfe-lP-srd" firstAttribute="top" secondItem="QFo-dW-tij" secondAttribute="top" id="xC2-Gi-e7t"/>
                         </constraints>
@@ -51,6 +62,7 @@
             </constraints>
             <size key="customSize" width="259" height="95"/>
             <connections>
+                <outlet property="imageRefLabel" destination="t4H-1z-Uxv" id="n2u-JK-yIK"/>
                 <outlet property="titleLabel" destination="TWa-Rp-gmp" id="gTZ-VJ-JLC"/>
             </connections>
             <point key="canvasLocation" x="206.5" y="399"/>
