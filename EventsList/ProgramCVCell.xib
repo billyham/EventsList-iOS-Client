@@ -62,6 +62,7 @@
             </constraints>
             <size key="customSize" width="259" height="95"/>
             <connections>
+                <outlet property="image" destination="Hfe-lP-srd" id="kXe-DX-4aR"/>
                 <outlet property="imageRefLabel" destination="t4H-1z-Uxv" id="n2u-JK-yIK"/>
                 <outlet property="titleLabel" destination="TWa-Rp-gmp" id="gTZ-VJ-JLC"/>
             </connections>

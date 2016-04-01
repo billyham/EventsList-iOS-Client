@@ -306,12 +306,22 @@ class MainIPhoneCVC: UICollectionViewController {
         let modelObject = self.arrayOfEvents[indexPath.row]
         cell.assignValues(modelObject.title, image440: modelObject.image440)
         
+        if modelObject.image440 != cell.imageName {
+            if cell.image != nil {
+                cell.image!.image = nil
+            }
+        }
+        
         // If modelObject has a value for image440Name, go get the image
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) {
             
             modelObject.retrieveImage440(modelObject.image440) { (image) in
                 
                 // !!!!____ Do something with the returned UIImage ____!!!!
+                if cell.image != nil {
+                    cell.image!.image = image
+                    cell.imageName = modelObject.image440
+                }
             }
         }
         

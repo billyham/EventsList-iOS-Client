@@ -12,6 +12,8 @@ class ProgramCVCell: UICollectionViewCell {
 
     @IBOutlet weak var titleLabel: UILabel?
     @IBOutlet weak var imageRefLabel: UILabel?
+    @IBOutlet weak var image: UIImageView?
+    var imageName: String?
     
     override func awakeFromNib() {
         super.awakeFromNib()

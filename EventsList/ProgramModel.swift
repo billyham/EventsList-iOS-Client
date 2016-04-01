@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CloudKit
 
 class ProgramModel: NSObject {
 
@@ -28,8 +29,6 @@ class ProgramModel: NSObject {
         }
         
         let cacheDirAsString = self.applicationDocumentsDirectory
-//        let cacheDirAsString = cacheDir.absoluteString
-        
         if cacheDirAsString == nil{
             print("Exit because cacheDirAsString is nil")
             return
@@ -40,15 +39,12 @@ class ProgramModel: NSObject {
             let arrayOfURLs = try fileManager.contentsOfDirectoryAtPath(cacheDirAsString!)
             print("contents of cache as string: \(arrayOfURLs)")
         }catch{
-//            print("Failed to get contents of cacheAsString")
+            print("Exit because failed to get contents of cacheDirAsString")
+            return
         }
-        
-
         
 //        print("Looking inside the cache director with imageName: \(imageName)")
 //        print("Looking inside the cache director with cacheAsString: \(cacheDirAsString)")
-        
-        // Check if cache dir exists
         
         // Get all files in this directory
         let fm = NSFileManager.defaultManager()
@@ -58,10 +54,13 @@ class ProgramModel: NSObject {
             
 //            print("Looking inside the cache director with imageName: \(imageName)")
             
-            // return the cached image
+            // Return a cached image with a matching name
             for stringThing in fileList {
                 
+                var foundMatch = false
                 if stringThing == imageName {
+                    
+                    foundMatch = true
                     
                     let cacheDir = NSURL.init(fileURLWithPath: cacheDirAsString!)
                     
@@ -79,22 +78,50 @@ class ProgramModel: NSObject {
                                 })
                             
                         }else{
-                            
+                            // Failed to read data as a UIImage
+                            foundMatch = false
                         }
                         
                     }else{
-                        
+                        // Failed to read data in cache
+                        foundMatch = false
                     }
                     
-                    
-                    
-                    // ____!!!! Return the uiimage in the completion block !!!!____
+                    // No need to continue in the loop if the match is successful already
+                    if foundMatch == true{
+                        break
+                    }
                     
                 }
+                // No matching files were found in the cache, try to get from cloudKit
+                if foundMatch == false {
+                    
+                    let myRecordID = CKRecordID.init(recordName: imageName!)
+                    
+                    let publicDatabase = CKContainer.defaultContainer().publicCloudDatabase
+                    publicDatabase.fetchRecordWithID(myRecordID, completionHandler: { (ckRecord, error) in
+                        if error != nil{
+                            print("Exit because error trying to fetch imageName: \(imageName) with error: \(error)")
+                        }else{
+                            
+                            let imageAsset = ckRecord?.objectForKey("image") as! CKAsset
+                            
+                            let imageData = NSData(contentsOfURL: imageAsset.fileURL)
+                            if let image = UIImage(data: imageData!){
+                                dispatch_async(dispatch_get_main_queue(), { 
+                                    completion(image: image)
+                                })
+                                
+//                                print("Found the image in cloudkit and returning to dataSource method")
+                            }else{
+                                print("Exit because failed to generate UIImage with data from CloudKit, with file: \(imageAsset.fileURL.absoluteString.stringByAppendingString(".png"))")
+                            }
+                        }
+                    })
+                }
             }
-            
         }catch{
-//            print("Program > retrieveImage440 failed to get contents of cache directory")
+            print("Program > retrieveImage440 failed to get contents of cache directory")
         }
     }
     
