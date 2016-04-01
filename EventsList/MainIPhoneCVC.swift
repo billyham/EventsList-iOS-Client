@@ -252,7 +252,7 @@ class MainIPhoneCVC: UICollectionViewController {
                     
                     // Force loading the cells in view
                     // What the hell!!!!
-                    self.collectionView!.reloadData()
+//                    self.collectionView!.reloadData()
                 }
             }
         }
