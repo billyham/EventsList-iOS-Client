@@ -244,12 +244,17 @@ class MainIPhoneCVC: UICollectionViewController {
         // OK, sure, this. Un huh
         coordinator.animateAlongsideTransition(nil) { (context) in
             
-            // Scroll to top
-            self.collectionView!.scrollToItemAtIndexPath(NSIndexPath.init(forRow: 0, inSection: 0), atScrollPosition: UICollectionViewScrollPosition.Top, animated: false)
-            
-            // Force loading the cells in view
-            // What the hell!!!!
-            self.collectionView!.reloadData()
+            if self.collectionView?.numberOfSections() > 0 {
+                if self.collectionView?.numberOfItemsInSection(0) > 0{
+                    
+                    // Scroll to top
+                    self.collectionView!.scrollToItemAtIndexPath(NSIndexPath.init(forRow: 0, inSection: 0), atScrollPosition: UICollectionViewScrollPosition.Top, animated: false)
+                    
+                    // Force loading the cells in view
+                    // What the hell!!!!
+                    self.collectionView!.reloadData()
+                }
+            }
         }
         
         super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
