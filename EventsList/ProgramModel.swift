@@ -11,9 +11,9 @@ import CloudKit
 
 class ProgramModel: NSObject {
 
-    var title: String
-    var ckRecordName: String
-    var image440: String?
+    let title: String
+    let ckRecordName: String
+    let image440: String?
     
     init(title: String, ckRecordName: String, image440: String?) {
         self.title = title
