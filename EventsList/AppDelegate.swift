@@ -17,6 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var myContext: NSManagedObjectContext?
+    var myNetworkController: NetworkController?
 
     func testZone(zoneString: String, completion:(result: Bool) -> Void) {
         
@@ -127,6 +128,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let controller = navigationController.topViewController as! MainIPhoneCVC
         controller.myContext = self.managedObjectContext;
         self.myContext = controller.myContext
+        
+        // #### Pass the NetworkController to the main view controller ####
+        self.myNetworkController = NetworkController.init(context: self.myContext)
+        controller.myNetworkController = self.myNetworkController
         
         return true
     }

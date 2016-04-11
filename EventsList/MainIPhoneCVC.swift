@@ -17,7 +17,8 @@ class MainIPhoneCVC: UICollectionViewController {
     private var arrayOfEvents = [ProgramModel]()
     
     internal var myContext: NSManagedObjectContext?
-
+    internal var myNetworkController: NetworkController?
+    
     // MARK: - View methods
     
     override func viewDidLoad() {
@@ -227,6 +228,14 @@ class MainIPhoneCVC: UICollectionViewController {
     }
     
     
+    // MARK: - Responding to Changes in image cache
+    
+    internal func newImageInCache() {
+        
+        // Reload the cell that uses this image, use imageName (recordName)
+    }
+    
+    
     // MARK: - Responding to orientation changes
     
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
@@ -268,13 +277,90 @@ class MainIPhoneCVC: UICollectionViewController {
 //
 //    }
     
+    // MARK: - Retrieve image locally 
+    func retrieveImage(imageName: String) -> UIImage? {
+        
+        let cacheDirAsString = self.applicationDocumentsCacheDirectory
+        if cacheDirAsString == nil{
+            print("Exit because cacheDirAsString is nil")
+            return nil
+        }
+        
+        let fileManager = NSFileManager.defaultManager()
+        do {
+            let arrayOfURLs = try fileManager.contentsOfDirectoryAtPath(cacheDirAsString!)
+            print("contents of cache as string: \(arrayOfURLs)")
+        }catch{
+            print("Exit because failed to get contents of cacheDirAsString")
+            return nil
+        }
+        
+        // Get all files in this directory
+        let fm = NSFileManager.defaultManager()
+        
+        do {
+            let fileList = try fm.contentsOfDirectoryAtPath(cacheDirAsString!)
+            
+            print("Looking inside the cache director with imageName: \(imageName)")
+            
+            // Return a cached image with a matching name
+            for stringThing in fileList {
+                
+                if stringThing == imageName {
+                    
+                    let cacheDir = NSURL.init(fileURLWithPath: cacheDirAsString!)
+                    
+                    let imagePath: NSURL = cacheDir.URLByAppendingPathComponent(imageName)
+                    print("This is the NSURL for the NSData PNG image in cache: \(imagePath)")
+                    
+                    let fileHandle = NSFileHandle.init(forReadingAtPath: imagePath.absoluteString)
+                    
+                    if fileHandle != nil{
+                        let imageAsImage = UIImage.init(data: (fileHandle?.readDataToEndOfFile())!, scale: 1.0)
+                        if imageAsImage != nil {
+                            
+                            print("Found image in cache")
+                            return imageAsImage
+                            
+                        }else{
+                            // Failed to read data as a UIImage
+                            return nil
+                        }
+                        
+                    }else{
+                        // Failed to read data in cache
+                        return nil
+                    }
+                }
+            }
+        }catch{
+            print("Program > retrieveImage440 failed to get contents of cache directory")
+            return nil
+        }
+        return nil
+     }
+    
+    
+    // MARK: - Cache Directory
+    
+    lazy var applicationDocumentsCacheDirectory: String? = {
+    
+        let paths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        if paths.count > 0 {
+            let basePath = paths[0]
+            return basePath
+        }else{
+            return nil
+        }
+    }()
+    
     
     // MARK: - Flow Layout Delegate methods
     
     func collectionView(collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                                sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize{
-        
+    
         if self.collectionView!.frame.size.width < 400 {
             return CGSize.init(width: self.collectionView!.frame.size.width, height: 65.0)
         }else{
@@ -306,25 +392,44 @@ class MainIPhoneCVC: UICollectionViewController {
         let modelObject = self.arrayOfEvents[indexPath.row]
         cell.assignValues(modelObject.title, image440: modelObject.image440)
         
+        // For re-used cells, remove the image if it doesn't match the
+        // desired image name
         if modelObject.image440 != cell.imageName {
             if cell.image != nil {
                 cell.image!.image = nil
             }
         }
         
-        // If modelObject has a value for image440Name, go get the image
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) {
+        // ####################
+        // If modelObject has a value for image440Name...
+        // Get image from local store
+        // If it doesn't exist locally...
+        // Have the network controller get the image and save locally
+        // And then fire a notification that tells this VC to re-render the cell
+        // ####################
+        
+        if modelObject.image440 != nil {
             
-            modelObject.retrieveImage440(modelObject.image440) { (image) in
-                
-                // !!!!____ Do something with the returned UIImage ____!!!!
+            if let imageAsImage = self.retrieveImage(modelObject.image440!){
                 if cell.image != nil {
-                    cell.image!.image = image
+                    cell.image!.image = imageAsImage
                     cell.imageName = modelObject.image440
+                }
+            }else{
+                
+                if self.myNetworkController != nil {
+                    self.myNetworkController?.requestImageFromCloud(modelObject.image440!, completion: {
+                        booleanValue in
+                        
+                        if (booleanValue == true){
+                            print("completion says true")
+                        }else{
+                            print("completion is false")
+                        }
+                    })
                 }
             }
         }
-        
         
         return cell
     }
