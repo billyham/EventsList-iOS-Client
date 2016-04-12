@@ -48,6 +48,11 @@ class MyImageRequest: NSOperation {
                     // Save image to cache
                     self.saveImage(image, imageName: self.imageName)
                     
+                    // Do this in the main thread...
+                    dispatch_async(dispatch_get_main_queue(), {
+                        NSNotificationCenter.defaultCenter().postNotificationName("newImageInCache", object: nil, userInfo: ["imageName": self.imageName])
+                    })
+                    
                 }else{
                     print("Exit because failed to generate UIImage with data from CloudKit, with file: \(imageAsset.fileURL.absoluteString.stringByAppendingString(".png"))")
                 }
@@ -191,6 +196,7 @@ class NetworkController: NSObject {
         let operationQueue = imageQueue
         operationQueue.addOperation(request)
         
+        // This return value is misleading, it potentially fires before the execution of the NSOperation
         completion(true)
     }
     

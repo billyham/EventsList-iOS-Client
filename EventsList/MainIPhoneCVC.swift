@@ -27,6 +27,10 @@ class MainIPhoneCVC: UICollectionViewController {
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
+        // Register for notifications
+        let defaultNotificationCenter = NSNotificationCenter.defaultCenter()
+        defaultNotificationCenter.addObserver(self, selector: #selector(self.newImageInCache), name: "newImageInCache", object: nil)
+        
         // Register cell classes
 //        self.collectionView!.registerClass(ProgramCVCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         self.collectionView!.registerNib(UINib.init(nibName: "ProgramCVCell", bundle: nil), forCellWithReuseIdentifier: "Cell")
@@ -230,9 +234,24 @@ class MainIPhoneCVC: UICollectionViewController {
     
     // MARK: - Responding to Changes in image cache
     
-    internal func newImageInCache() {
+    func newImageInCache(note: NSNotification) {
         
-        // Reload the cell that uses this image, use imageName (recordName)
+        if note.userInfo != nil {
+            let userDictionary = note.userInfo
+            let imageName = userDictionary!["imageName"] as! String
+            print("notification fires, this is the userInfo: \(userDictionary!["imageName"])")
+            
+            for index in 0..<self.arrayOfEvents.count {
+                if self.arrayOfEvents[index].image440 == imageName {
+                    self.collectionView?.reloadItemsAtIndexPaths([NSIndexPath.init(forRow: index, inSection: 0)])
+                    print("did reload item at index: \(index)")
+                    break
+                }
+            }
+        }else{
+            print("notification fires with no userInfo")
+        }
+        
     }
     
     
@@ -286,22 +305,11 @@ class MainIPhoneCVC: UICollectionViewController {
             return nil
         }
         
-        let fileManager = NSFileManager.defaultManager()
-        do {
-            let arrayOfURLs = try fileManager.contentsOfDirectoryAtPath(cacheDirAsString!)
-            print("contents of cache as string: \(arrayOfURLs)")
-        }catch{
-            print("Exit because failed to get contents of cacheDirAsString")
-            return nil
-        }
-        
-        // Get all files in this directory
+        // Get all files in the cache directory
         let fm = NSFileManager.defaultManager()
         
         do {
             let fileList = try fm.contentsOfDirectoryAtPath(cacheDirAsString!)
-            
-            print("Looking inside the cache director with imageName: \(imageName)")
             
             // Return a cached image with a matching name
             for stringThing in fileList {
@@ -311,24 +319,21 @@ class MainIPhoneCVC: UICollectionViewController {
                     let cacheDir = NSURL.init(fileURLWithPath: cacheDirAsString!)
                     
                     let imagePath: NSURL = cacheDir.URLByAppendingPathComponent(imageName)
-                    print("This is the NSURL for the NSData PNG image in cache: \(imagePath)")
                     
-                    let fileHandle = NSFileHandle.init(forReadingAtPath: imagePath.absoluteString)
-                    
-                    if fileHandle != nil{
-                        let imageAsImage = UIImage.init(data: (fileHandle?.readDataToEndOfFile())!, scale: 1.0)
+                    do {
+                        let fileHandle = try NSFileHandle.init(forReadingFromURL:imagePath)
+                        
+                        let imageAsImage = UIImage.init(data: (fileHandle.readDataToEndOfFile()), scale: 1.0)
                         if imageAsImage != nil {
-                            
-                            print("Found image in cache")
                             return imageAsImage
-                            
                         }else{
                             // Failed to read data as a UIImage
+                            print("Failed to read data as a UIImage")
                             return nil
                         }
-                        
-                    }else{
+                    }catch{
                         // Failed to read data in cache
+                        print("Failed to read data in cache")
                         return nil
                     }
                 }
