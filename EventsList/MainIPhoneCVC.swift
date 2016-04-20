@@ -15,11 +15,14 @@ class MainIPhoneCVC: UICollectionViewController {
     
     private let reuseIdentifier = "Cell"
     private var arrayOfEvents = [ProgramModel]()
+    private var webView: webVC?
     
     internal var myContext: NSManagedObjectContext?
     internal var myNetworkController: NetworkController?
     
     // MARK: - View methods
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -277,10 +280,6 @@ class MainIPhoneCVC: UICollectionViewController {
                     
                     // Scroll to top
                     self.collectionView!.scrollToItemAtIndexPath(NSIndexPath.init(forRow: 0, inSection: 0), atScrollPosition: UICollectionViewScrollPosition.Top, animated: false)
-                    
-                    // Force loading the cells in view
-                    // What the hell!!!!
-//                    self.collectionView!.reloadData()
                 }
             }
         }
@@ -441,6 +440,26 @@ class MainIPhoneCVC: UICollectionViewController {
 
     // MARK: - UICollectionViewDelegate
 
+    override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        
+        // Action depends on current orientation...
+        
+        let thisOrientation = UIDevice.currentDevice().orientation
+        if thisOrientation == UIDeviceOrientation.Portrait{
+            self.performSegueWithIdentifier("showDetail", sender: self.navigationController)
+            
+        }else{
+            let webView = webVC.init(nibName: "webVC", bundle: nil)
+            self.webView = webView
+            self.modalPresentationStyle = UIModalPresentationStyle.FormSheet
+            self.presentViewController(self.webView!, animated: true) {
+                
+            }
+        }
+        
+        
+    }
+    
     /*
     // Uncomment this method to specify if the specified item should be highlighted during tracking
     override func collectionView(collectionView: UICollectionView, shouldHighlightItemAtIndexPath indexPath: NSIndexPath) -> Bool {

@@ -45,6 +45,9 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
+                                <connections>
+                                    <segue destination="TFl-7k-wOV" kind="show" identifier="showDetail" id="Dar-fO-uUD"/>
+                                </connections>
                             </collectionViewCell>
                         </cells>
                         <connections>
@@ -57,6 +60,25 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="T86-oR-oPe" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="406.5" y="-450.5"/>
+        </scene>
+        <!--Event Detail-->
+        <scene sceneID="4H0-lg-ZuJ">
+            <objects>
+                <viewController id="TFl-7k-wOV" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Had-fY-Z5C"/>
+                        <viewControllerLayoutGuide type="bottom" id="gxq-rh-gNq"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="xfd-Oj-zgm">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Event Detail" id="9Pz-4h-Ytv"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rph-OM-a9n" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="923.5" y="-450.5"/>
         </scene>
     </scenes>
 </document>
