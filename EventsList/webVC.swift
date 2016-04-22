@@ -11,8 +11,11 @@ import WebKit
 
 class webVC: UIViewController {
     
+    @IBOutlet weak var noVideoLabel: UILabel?
+    @IBOutlet weak var dismissButton: UIButton?
     var webView: WKWebView?
-
+    var video: String?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -20,19 +23,37 @@ class webVC: UIViewController {
 //        let orientationValue = UIInterfaceOrientation.LandscapeLeft.rawValue
 //        UIDevice.currentDevice().setValue(orientationValue, forKey: "orientation")
 
-        let webView = WKWebView.init(frame: self.view.frame)
-        self.webView = webView
-        
-        let myUrl = NSURL.init(string: "https://www.youtube.com/watch?v=pmLJrnN8aEU")
-        
-        if self.webView != nil{
-            self.view.addSubview(self.webView!)
-            // ____!!!! Needs constraints???  !!!!____
+        if self.video == nil {
             
-            self.webView!.loadRequest(NSURLRequest.init(URL: myUrl!))
+            // Alert that there is no video to show
+            self.noVideoLabel?.hidden = false
+            self.dismissButton?.hidden = false
+            return
+            
+        }else{
+            
+            self.noVideoLabel?.hidden = true
+            self.dismissButton?.hidden = true
+            
+            let webView = WKWebView.init(frame: self.view.frame)
+            self.webView = webView
+            
+            let myUrl = NSURL.init(string: self.video!)
+            
+            if self.webView != nil{
+                self.view.addSubview(self.webView!)
+                // TODO: Needs constraints?
+                
+                self.webView!.loadRequest(NSURLRequest.init(URL: myUrl!))
+            }
         }
     }
     
+    
+    @IBAction func dismissWebView() {
+        self.dismissViewControllerAnimated(true, completion: {
+        })
+    }
     
     // MARK: - Orientation allowances and changes
     

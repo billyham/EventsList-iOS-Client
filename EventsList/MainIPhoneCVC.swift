@@ -22,8 +22,6 @@ class MainIPhoneCVC: UICollectionViewController {
     
     // MARK: - View methods
     
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -61,7 +59,12 @@ class MainIPhoneCVC: UICollectionViewController {
             
             for object in arrayResult!{
                 let newObject = object as! Program
-                arrayOfNewEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: newObject.ckRecordName!, image440: newObject.image440Name))
+                arrayOfNewEvents.append(ProgramModel.init(
+                    title: object.title!!,
+                    ckRecordName: newObject.ckRecordName!,
+                    image440: newObject.image440Name,
+                    video: newObject.video
+                    ))
             }
             
         }catch let error as NSError{
@@ -164,7 +167,12 @@ class MainIPhoneCVC: UICollectionViewController {
                 for object in arrayResult!{
                     if object.title != nil{
                         let newObject = object as! Program
-                        self.arrayOfEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: newObject.ckRecordName!, image440: newObject.image440Name))
+                        self.arrayOfEvents.append(ProgramModel.init(
+                            title: object.title!!,
+                            ckRecordName: newObject.ckRecordName!,
+                            image440: newObject.image440Name,
+                            video: newObject.video
+                            ))
                     }
                 }
                 dispatch_async(dispatch_get_main_queue(), {
@@ -193,7 +201,12 @@ class MainIPhoneCVC: UICollectionViewController {
             
             for object in arrayResult!{
                 let newObject = object as! Program
-                arrayOfNewEvents.append(ProgramModel.init(title: object.title!!, ckRecordName: newObject.ckRecordName!, image440: newObject.image440Name))
+                arrayOfNewEvents.append(ProgramModel.init(
+                    title: object.title!!,
+                    ckRecordName: newObject.ckRecordName!,
+                    image440: newObject.image440Name,
+                    video: newObject.video
+                    ))
             }
             
         }catch let error as NSError{
@@ -404,13 +417,13 @@ class MainIPhoneCVC: UICollectionViewController {
             }
         }
         
-        // ####################
+        // ####
         // If modelObject has a value for image440Name...
         // Get image from local store
         // If it doesn't exist locally...
         // Have the network controller get the image and save locally
         // And then fire a notification that tells this VC to re-render the cell
-        // ####################
+        // ####
         
         if modelObject.image440 != nil {
             
@@ -450,6 +463,7 @@ class MainIPhoneCVC: UICollectionViewController {
             
         }else{
             let webView = webVC.init(nibName: "webVC", bundle: nil)
+            webView.video = self.arrayOfEvents[indexPath.row].video
             self.webView = webView
             self.modalPresentationStyle = UIModalPresentationStyle.FormSheet
             self.presentViewController(self.webView!, animated: true) {

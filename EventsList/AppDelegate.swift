@@ -78,7 +78,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if (error) != nil{
                 print("error trying to retrieve subscriptions \(error)")
                 
-                // ___!!!! After failing to retrieve the specified subscription, it should delete any existing subscriptions... !!!!____
+                // #### After failing to retrieve the specified subscription, it should delete any existing subscriptions... ####
                 
                 // Try looking at all subscriptions
                 publicDatabase.fetchAllSubscriptionsWithCompletionHandler({ (subscriptionArray, error) -> Void in
@@ -157,7 +157,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         
-        // Create subscription
+        // #### Create subscription ####
         
         // A unique subscription ID
         
@@ -393,7 +393,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return boolValue
         })
         
-        // ___!!!!  Map? Or loop? !!!!____
+        // TODO: Change Map to Loop?
         _ = filteredArrayResult.map { (programItem) -> Program in
             for ckItem in arrayOfCKRecords {
                 if ckItem.recordID.recordName == programItem.ckRecordName{
@@ -426,6 +426,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         programAddition.title = record.objectForKey("title") as? String
         programAddition.ckRecordName = record.recordID.recordName
         programAddition.image440Name = record.objectForKey("imageRef") as? String
+        programAddition.video = record.objectForKey("video") as? String
         
         if let tempRecord: CKReference = record.objectForKey("imageRef") as? CKReference{
             programAddition.image440Name = tempRecord.recordID.recordName

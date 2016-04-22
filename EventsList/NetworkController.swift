@@ -6,7 +6,7 @@
 //  Copyright © 2016 Hamagain LLC. All rights reserved.
 //
 
-//  ____!!!!  Follows example from https://realm.io/news/slug-marcus-zarra-exploring-mvcn-swift/  !!!!____
+// #### Follows example from https://realm.io/news/slug-marcus-zarra-exploring-mvcn-swift/ ####
 
 import UIKit
 import CoreData
@@ -184,11 +184,11 @@ class NetworkController: NSObject {
     
     internal func requestImageFromCloud(imageName: String, completion: (Bool -> Void)) {
         
-        // ####################
+        // ####
         // Get images from CloudKit
         // Place in cache i.e. cache folder in app document folder
         // Tell view controller that an update has occurred, it will re-render the appropriate cells
-        // ####################
+        // ####
         
         let request = MyImageRequest.init(imageName: imageName,
                                           cacheDir: self.applicationDocumentsCacheDirectory)

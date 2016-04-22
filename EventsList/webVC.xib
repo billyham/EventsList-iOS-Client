@@ -7,6 +7,8 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="webVC" customModule="EventsList" customModuleProvider="target">
             <connections>
+                <outlet property="dismissButton" destination="oQP-Qj-JE5" id="bIh-UI-nCT"/>
+                <outlet property="noVideoLabel" destination="a9g-PN-giM" id="T8O-Zm-c0E"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -14,7 +16,34 @@
         <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
             <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sorry, no video to show." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="a9g-PN-giM">
+                    <rect key="frame" x="209" y="259" width="182.5" height="21"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="21" id="gQY-ry-5al"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oQP-Qj-JE5">
+                    <rect key="frame" x="273" y="305" width="54" height="50"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="50" id="Jxc-M6-g4m"/>
+                    </constraints>
+                    <state key="normal" title="Dismiss"/>
+                    <connections>
+                        <action selector="dismissWebView" destination="-1" eventType="touchUpInside" id="8qd-39-7Qi"/>
+                    </connections>
+                </button>
+            </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="oQP-Qj-JE5" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" constant="30" id="SaS-gq-ubQ"/>
+                <constraint firstItem="a9g-PN-giM" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="hiE-k2-2tb"/>
+                <constraint firstItem="oQP-Qj-JE5" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="mkm-Q9-4nj"/>
+                <constraint firstItem="a9g-PN-giM" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" constant="-30" id="sZo-7y-D1U"/>
+            </constraints>
             <nil key="simulatedTopBarMetrics"/>
             <nil key="simulatedBottomBarMetrics"/>
             <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>

@@ -11,8 +11,9 @@ import UIKit
 class ProgramCVCell: UICollectionViewCell {
 
     @IBOutlet weak var titleLabel: UILabel?
-    @IBOutlet weak var imageRefLabel: UILabel?
     @IBOutlet weak var image: UIImageView?
+    
+    // #### This value gets used by the VC to confirm the correct image is used for the CollectionView cell ####
     var imageName: String?
     
     override func awakeFromNib() {
@@ -25,7 +26,9 @@ class ProgramCVCell: UICollectionViewCell {
             titleLabel!.text = title
         }
         
-        imageRefLabel?.text = image440
+//        imageRefLabel?.text = image440
+        
+        
     }
 
 }
