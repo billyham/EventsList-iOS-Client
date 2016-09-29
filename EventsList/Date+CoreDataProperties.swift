@@ -14,11 +14,11 @@ import CoreData
 
 extension Date {
 
-    @NSManaged var dateStart: NSDate?
-    @NSManaged var dateEnd: NSDate?
+    @NSManaged var dateStart: Foundation.Date?
+    @NSManaged var dateEnd: Foundation.Date?
     @NSManaged var live: NSNumber?
     @NSManaged var hideFromPublic: NSNumber?
-    @NSManaged var dateAvailable: NSDate?
+    @NSManaged var dateAvailable: Foundation.Date?
     @NSManaged var programRef: Program?
 
 }

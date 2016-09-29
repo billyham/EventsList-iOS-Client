@@ -26,44 +26,44 @@ class webVC: UIViewController {
         if self.video == nil {
             
             // Alert that there is no video to show
-            self.noVideoLabel?.hidden = false
-            self.dismissButton?.hidden = false
+            self.noVideoLabel?.isHidden = false
+            self.dismissButton?.isHidden = false
             return
             
         }else{
             
-            self.noVideoLabel?.hidden = true
-            self.dismissButton?.hidden = true
+            self.noVideoLabel?.isHidden = true
+            self.dismissButton?.isHidden = true
             
             let webView = WKWebView.init(frame: self.view.frame)
             self.webView = webView
             
-            let myUrl = NSURL.init(string: self.video!)
+            let myUrl = URL.init(string: self.video!)
             
             if self.webView != nil{
                 self.view.addSubview(self.webView!)
                 // TODO: Needs constraints?
                 
-                self.webView!.loadRequest(NSURLRequest.init(URL: myUrl!))
+                self.webView!.load(URLRequest.init(url: myUrl!))
             }
         }
     }
     
     
     @IBAction func dismissWebView() {
-        self.dismissViewControllerAnimated(true, completion: {
+        self.dismiss(animated: true, completion: {
         })
     }
     
     // MARK: - Orientation allowances and changes
     
-    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         
         let widthValue = size.width
         if widthValue < 400 {
             
             // Rotated to portrait, exit the webView
-            self.dismissViewControllerAnimated(true, completion: { 
+            self.dismiss(animated: true, completion: { 
                 
                 
             })
@@ -76,7 +76,7 @@ class webVC: UIViewController {
         }
     }
     
-    override func shouldAutorotate() -> Bool {
+    override var shouldAutorotate : Bool {
         return true
     }
 

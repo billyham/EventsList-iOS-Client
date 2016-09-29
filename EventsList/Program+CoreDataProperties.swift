@@ -14,11 +14,11 @@ import CoreData
 
 extension Program {
 
-    @NSManaged var ckRecord: NSData?
+    @NSManaged var ckRecord: Data?
     @NSManaged var ckRecordName: String?
     @NSManaged var classInfo: String?
-    @NSManaged var dateEnd: NSDate?
-    @NSManaged var dateStart: NSDate?
+    @NSManaged var dateEnd: Foundation.Date?
+    @NSManaged var dateStart: Foundation.Date?
     @NSManaged var descFull: String?
     @NSManaged var descMed: String?
     @NSManaged var descShort: String?
@@ -31,7 +31,7 @@ extension Program {
     @NSManaged var venue: String?
     @NSManaged var video: String?
     @NSManaged var image440Name: String?
-    @NSManaged var image440Ref: NSData?
+    @NSManaged var image440Ref: Data?
     @NSManaged var dateRef: NSSet?
 
 }

@@ -10,7 +10,6 @@
 		016591721C935867001EA073 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 016591711C935867001EA073 /* CloudKit.framework */; };
 		0165917A1C9397F0001EA073 /* Date+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016591761C9397F0001EA073 /* Date+CoreDataProperties.swift */; };
 		0165917B1C9397F0001EA073 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016591771C9397F0001EA073 /* Date.swift */; };
-		54182F291D651620003745BD /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 54182F281D651620003745BD /* README.md */; };
 		54D0FD631CB3809000E6C5ED /* NetworkController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54D0FD621CB3809000E6C5ED /* NetworkController.swift */; };
 		54E90E481CC74F090060A022 /* EventDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E90E471CC74F090060A022 /* EventDetailVC.swift */; };
 		54E90E4D1CC752730060A022 /* webVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E90E4B1CC752730060A022 /* webVC.swift */; };
@@ -54,7 +53,6 @@
 		016591711C935867001EA073 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		016591761C9397F0001EA073 /* Date+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		016591771C9397F0001EA073 /* Date.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
-		54182F281D651620003745BD /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = EventsList/README.md; sourceTree = "<group>"; };
 		54D0FD621CB3809000E6C5ED /* NetworkController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkController.swift; sourceTree = "<group>"; };
 		54E90E471CC74F090060A022 /* EventDetailVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventDetailVC.swift; sourceTree = "<group>"; };
 		54E90E4B1CC752730060A022 /* webVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = webVC.swift; sourceTree = "<group>"; };
@@ -127,7 +125,6 @@
 				54F4ED4B1C86C9C20031A9BB /* EventsListTests */,
 				54F4ED561C86C9C20031A9BB /* EventsListUITests */,
 				54F4ED321C86C9C20031A9BB /* Products */,
-				54182F281D651620003745BD /* README.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -247,12 +244,13 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0720;
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Hamagain LLC";
 				TargetAttributes = {
 					54F4ED301C86C9C10031A9BB = {
 						CreatedOnToolsVersion = 7.2.1;
 						DevelopmentTeam = C3YDZ7M5S2;
+						LastSwiftMigration = 0800;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -267,10 +265,12 @@
 					};
 					54F4ED471C86C9C20031A9BB = {
 						CreatedOnToolsVersion = 7.2.1;
+						LastSwiftMigration = 0800;
 						TestTargetID = 54F4ED301C86C9C10031A9BB;
 					};
 					54F4ED521C86C9C20031A9BB = {
 						CreatedOnToolsVersion = 7.2.1;
+						LastSwiftMigration = 0800;
 						TestTargetID = 54F4ED301C86C9C10031A9BB;
 					};
 				};
@@ -340,7 +340,6 @@
 				54E90E4D1CC752730060A022 /* webVC.swift in Sources */,
 				54F4ED351C86C9C20031A9BB /* AppDelegate.swift in Sources */,
 				54FD40D51CABCE8E0042DB23 /* ProgramCVCell.swift in Sources */,
-				54182F291D651620003745BD /* README.md in Sources */,
 				54F4ED681C86CBFC0031A9BB /* MainIPhoneCVC.swift in Sources */,
 				54F4ED6A1C86CCF20031A9BB /* ProgramModel.swift in Sources */,
 				54F4ED3D1C86C9C20031A9BB /* EventsList.xcdatamodeld in Sources */,
@@ -411,8 +410,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -434,7 +435,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -456,8 +457,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -473,9 +476,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -484,7 +488,6 @@
 		54F4ED5D1C86C9C20031A9BB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = EventsList/EventsList.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -496,6 +499,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -503,7 +507,6 @@
 		54F4ED5E1C86C9C20031A9BB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = EventsList/EventsList.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -514,6 +517,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "David-Vincent-Hanagan.EventsList";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
@@ -526,6 +530,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "David-Vincent-Hanagan.EventsListTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EventsList.app/EventsList";
 			};
 			name = Debug;
@@ -538,6 +543,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "David-Vincent-Hanagan.EventsListTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EventsList.app/EventsList";
 			};
 			name = Release;
@@ -549,6 +555,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "David-Vincent-Hanagan.EventsListUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_TARGET_NAME = EventsList;
 				USES_XCTRUNNER = YES;
 			};
@@ -561,6 +568,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "David-Vincent-Hanagan.EventsListUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_TARGET_NAME = EventsList;
 				USES_XCTRUNNER = YES;
 			};

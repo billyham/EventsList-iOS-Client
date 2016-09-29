@@ -19,14 +19,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var myContext: NSManagedObjectContext?
     var myNetworkController: NetworkController?
 
-    func testZone(zoneString: String, completion:(result: Bool) -> Void) {
+    func testZone(_ zoneString: String, completion:@escaping (_ result: Bool) -> Void) {
         
         let container = CKContainer.init(identifier: "iCloud.David-Vincent-Hanagan.EventsList")
         let database = container.privateCloudDatabase
         
         let recordZoneID = CKRecordZoneID.init(zoneName: "Standard", ownerName: CKOwnerDefaultName)
         
-        database.fetchRecordZoneWithID(recordZoneID) { (recordZone, error) -> Void in
+        database.fetch(withRecordZoneID: recordZoneID) { (recordZone, error) -> Void in
             
             if ((error) != nil){
                 let recordZone = CKRecordZone.init(zoneName: "Standard")
@@ -35,21 +35,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 operation.modifyRecordZonesCompletionBlock = {(saved, _, error) in
                     if ((error) != nil){
                         print("failed to create Standard zone")
-                        completion(result: false)
+                        completion(false)
                     }else{
-                        completion(result: true)
+                        completion(true)
                     }
                 }
-                database.addOperation(operation)
+                database.add(operation)
                 
             }else{
-                completion(result: true)
+                completion(true)
             }
         }
     }
     
     
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
         // #### Save Initial user defaults ####
         
@@ -58,22 +58,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let appDefaults = ["firstDictionary": sampleDefault, "SubscriptionKeys": changeToken]
         
-        let standardDefaults = NSUserDefaults.standardUserDefaults()
-        standardDefaults.registerDefaults(appDefaults)
-        
+        let standardDefaults = UserDefaults.standard
+        standardDefaults.register(defaults: appDefaults)
+
         
         // #### Initiate CloudKit subscription ####
-        
+
         // Test if subscription already exists
-        let publicDatabase = CKContainer.defaultContainer().publicCloudDatabase
+        let publicDatabase = CKContainer.default().publicCloudDatabase
         
         // Get the unique subscriptionID from userDefaults
-        let secretValue: String = (NSUserDefaults.standardUserDefaults().objectForKey("firstDictionary")?.objectForKey("key"))! as! String
+        let secretObject: NSDictionary = UserDefaults.standard.object(forKey: "firstDictionary") as! NSDictionary
+        let secretValue: String = secretObject.object(forKey: "key") as! String
         
-        print("Here is the subscriptionID from userDefaults: \(secretValue)")
-        
+//        print("Here is the subscriptionID from userDefaults: \(secretValue)")
+
         // Fetch the unique CKSubscription by name
-        publicDatabase.fetchSubscriptionWithID(secretValue) { (subscription, error) -> Void in
+        publicDatabase.fetch(withSubscriptionID: secretValue) { (subscription, error) -> Void in
             
             if (error) != nil{
                 print("error trying to retrieve subscriptions \(error)")
@@ -81,7 +82,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 // #### After failing to retrieve the specified subscription, it should delete any existing subscriptions... ####
                 
                 // Try looking at all subscriptions
-                publicDatabase.fetchAllSubscriptionsWithCompletionHandler({ (subscriptionArray, error) -> Void in
+                publicDatabase.fetchAllSubscriptions(completionHandler: { (subscriptionArray, error) -> Void in
                     if subscriptionArray != nil{
                         
                         var countOfSubs = subscriptionArray!.count
@@ -90,7 +91,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         if countOfSubs > 0 {
                             
                             for subscriptionItem in subscriptionArray! {
-                                publicDatabase.deleteSubscriptionWithID(subscriptionItem.subscriptionID, completionHandler: {(subscriptionID, error) -> Void in
+                                publicDatabase.delete(withSubscriptionID: subscriptionItem.subscriptionID, completionHandler: {(subscriptionID, error) -> Void in
                                     
                                     if error != nil{
                                         print("Error attempting to delete subscriptionID: \(error))")
@@ -137,12 +138,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     
-    func createSubscription(application: UIApplication, publicDatabase: CKDatabase) {
+    func createSubscription(_ application: UIApplication, publicDatabase: CKDatabase) {
         
         // Get all existing data in Programs (because a new subscription will pass over this data)
         let predicateTest = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
         let query = CKQuery.init(recordType: "Program", predicate: predicateTest)
-        publicDatabase.performQuery(query, inZoneWithID: nil) { (arrayOfRecords, error) -> Void in
+        publicDatabase.perform(query, inZoneWith: nil) { (arrayOfRecords, error) -> Void in
             if error != nil {
                 print("Error trying to download all existing Programs before assigning the subscription")
             }else{
@@ -167,7 +168,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        let shortUUID = tempUUID.substringToIndex(stringIndex)
         
         //__2__
-        CKContainer.defaultContainer().fetchUserRecordIDWithCompletionHandler { (recordID, error) in
+        CKContainer.default().fetchUserRecordID { (recordID, error) in
             
             if error != nil{
                print("error trying to access user recordID \(error?.localizedDescription)")
@@ -175,19 +176,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }else{
                 
                 let tempUUID = recordID!.recordName
-                let stringIndex = tempUUID.startIndex.advancedBy(1)
-                let shortUUID = tempUUID.substringFromIndex(stringIndex)
+                let stringIndex = tempUUID.characters.index(tempUUID.startIndex, offsetBy: 1)
+                let shortUUID = tempUUID.substring(from: stringIndex)
                 print("this is the user record name: \(shortUUID)")
 
                 
                 // Register app for remote notifications
-                let notificationSettings = UIUserNotificationSettings.init(forTypes: UIUserNotificationType.Alert, categories: nil)
+                let notificationSettings = UIUserNotificationSettings.init(types: UIUserNotificationType.alert, categories: nil)
                 application.registerUserNotificationSettings(notificationSettings)
                 application.registerForRemoteNotifications()
                 
                 // Create subscription
-                let options = CKSubscriptionOptions.FiresOnRecordCreation.union(
-                    CKSubscriptionOptions.FiresOnRecordDeletion).union(CKSubscriptionOptions.FiresOnRecordUpdate)
+                let options = CKSubscriptionOptions.firesOnRecordCreation.union(
+                    CKSubscriptionOptions.firesOnRecordDeletion).union(CKSubscriptionOptions.firesOnRecordUpdate)
                 
                 let predicate = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
                 let subscription = CKSubscription.init(recordType:"Program", predicate: predicate, subscriptionID:shortUUID , options: options)
@@ -200,19 +201,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 subscription.notificationInfo = notificationInfo
                 
                 // Attempt to save the subscription
-                publicDatabase.saveSubscription(subscription) { (subscriptionResult, error) -> Void in
+                publicDatabase.save(subscription, completionHandler: { (subscriptionResult, error) -> Void in
                     
                     if (error) != nil{
                         print("error at saving subscription: \(error)")
                     }else{
-                        NSUserDefaults.standardUserDefaults().setObject(["key": shortUUID], forKey: "firstDictionary")
+                        UserDefaults.standard.set(["key": shortUUID], forKey: "firstDictionary")
                         
                         // #### Fetch Changed Records from CloudKit ####
                         self.queryForRecordIDs({ success in
                             
                         })
                     }
-                }
+                }) 
                 
             }
             
@@ -223,17 +224,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     }
 
-    func applicationWillResignActive(application: UIApplication) {
+    func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
     }
 
-    func applicationDidEnterBackground(application: UIApplication) {
+    func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
     }
 
-    func applicationWillEnterForeground(application: UIApplication) {
+    func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
         
         self.queryForRecordIDs({ success in
@@ -241,11 +242,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         })
     }
 
-    func applicationDidBecomeActive(application: UIApplication) {
+    func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     }
 
-    func applicationWillTerminate(application: UIApplication) {
+    func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         // Saves changes in the application's managed object context before the application terminates.
         self.saveContext()
@@ -253,7 +254,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // MARK: - Load CoreData with CloudKit data
     
-    func addPrograms(arrayOfCKRecords: [CKRecord]) {
+    func addPrograms(_ arrayOfCKRecords: [CKRecord]) {
         
         var context: NSManagedObjectContext
         if self.myContext != nil{
@@ -264,12 +265,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Get existing CoreData records to ensure a duplicate entry is not added. 
         var arrayOfExistingProgramModels = [String]()
-        let request = NSFetchRequest.init(entityName: "Program")
+        let request = NSFetchRequest<NSFetchRequestResult>.init(entityName: "Program")
         request.predicate = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
         
         //execute the fetch and add to a new array
         do {
-            let arrayResult = try context.executeFetchRequest(request)
+            let arrayResult = try context.fetch(request)
             for doodad in arrayResult{
                 let programThing = doodad as! Program
                 arrayOfExistingProgramModels.append(programThing.ckRecordName!)
@@ -283,13 +284,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         for record in arrayOfCKRecords {
             
-            if let _ = arrayOfExistingProgramModels.indexOf(record.recordID.recordName) {
+            if let _ = arrayOfExistingProgramModels.index(of: record.recordID.recordName) {
                 continue
             }else{
                 arrayOfFilteredCKRecords.append(record)
             }
             
-            let programAddition = NSEntityDescription.insertNewObjectForEntityForName("Program", inManagedObjectContext: context) as! Program
+            let programAddition = NSEntityDescription.insertNewObject(forEntityName: "Program", into: context) as! Program
             
             self.mutateProgramWithCKRecord(programAddition, record: record, context: context)
             
@@ -316,7 +317,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
 
     
-    func deletePrograms(arrayOfRecordIDs: [CKRecordID]?) {
+    func deletePrograms(_ arrayOfRecordIDs: [CKRecordID]?) {
         
         var context: NSManagedObjectContext
         if self.myContext != nil{
@@ -330,14 +331,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if arrayOfRecordIDs != nil{
             for recordID in arrayOfRecordIDs! {
                 
-                let request = NSFetchRequest.init(entityName: "Program")
+                let request = NSFetchRequest<NSFetchRequestResult>.init(entityName: "Program")
                 request.predicate = NSPredicate.init(format: "ckRecordName == %@", argumentArray: [recordID.recordName])
                 
                 //execute the fetch and add to a new array
                 do {
-                    let arrayResult = try context.executeFetchRequest(request)
+                    let arrayResult = try context.fetch(request)
                     if arrayResult.count > 0{
-                        context.deleteObject(arrayResult[0] as! NSManagedObject)
+                        context.delete(arrayResult[0] as! NSManagedObject)
                         arrayOfFinalRecordsIDs.append(recordID)
                     }
                 }catch{
@@ -359,7 +360,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    func updatePrograms(arrayOfCKRecords: [CKRecord]) {
+    func updatePrograms(_ arrayOfCKRecords: [CKRecord]) {
         
         var context: NSManagedObjectContext
         if self.myContext != nil{
@@ -370,12 +371,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Get matching coredata records to update
         var arrayOfExistingPrograms = [Program]()
-        let request = NSFetchRequest.init(entityName: "Program")
+        let request = NSFetchRequest<NSFetchRequestResult>.init(entityName: "Program")
         request.predicate = NSPredicate.init(format: "TRUEPREDICATE", argumentArray: nil)
         
         //execute the fetch
         do {
-            arrayOfExistingPrograms = try context.executeFetchRequest(request) as! [Program]
+            arrayOfExistingPrograms = try context.fetch(request) as! [Program]
         }catch{
             print("Failed coredata fetch")
             return
@@ -421,30 +422,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    func mutateProgramWithCKRecord(programAddition: Program, record: CKRecord, context: NSManagedObjectContext) -> Void {
+    func mutateProgramWithCKRecord(_ programAddition: Program, record: CKRecord, context: NSManagedObjectContext) -> Void {
         
-        programAddition.title = record.objectForKey("title") as? String
+        programAddition.title = record.object(forKey: "title") as? String
         programAddition.ckRecordName = record.recordID.recordName
-        programAddition.image440Name = record.objectForKey("imageRef") as? String
-        programAddition.video = record.objectForKey("video") as? String
+        programAddition.image440Name = record.object(forKey: "imageRef") as? String
+        programAddition.video = record.object(forKey: "video") as? String
         
-        if let tempRecord: CKReference = record.objectForKey("imageRef") as? CKReference{
+        if let tempRecord: CKReference = record.object(forKey: "imageRef") as? CKReference{
             programAddition.image440Name = tempRecord.recordID.recordName
         }
         
         // Save CKRecord System properties to managed object
         let archivedData = NSMutableData()
-        let archiver = NSKeyedArchiver(forWritingWithMutableData: archivedData)
+        let archiver = NSKeyedArchiver(forWritingWith: archivedData)
         archiver.requiresSecureCoding = true
-        record.encodeSystemFieldsWithCoder(archiver)
+        record.encodeSystemFields(with: archiver)
         archiver.finishEncoding()
-        programAddition.ckRecord = archivedData
+        programAddition.ckRecord = archivedData as Data
     }
     
 
     // MARK: - Handle Remote Notifications
     
-    func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject], fetchCompletionHandler completionHandler: (UIBackgroundFetchResult) -> Void) {
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         
         let newThing  = userInfo as? [String:NSObject]
         
@@ -454,16 +455,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.queryForRecordIDs { (success) -> Void in
             
             if (success){
-                completionHandler(UIBackgroundFetchResult.NewData)
+                completionHandler(UIBackgroundFetchResult.newData)
             }else{
-                completionHandler(UIBackgroundFetchResult.Failed)
+                completionHandler(UIBackgroundFetchResult.failed)
             }
         }
     }
     
     // MARK: - Use CloudKit to retrieve CloudKit recordIDs and then records
     
-    func queryForRecordIDs(completionHandler:(success: Bool) -> Void) -> Void {
+    func queryForRecordIDs(_ completionHandler:@escaping (_ success: Bool) -> Void) -> Void {
         
         let serverChangeToken: CKServerChangeToken? = previousChangeToken
         let notificationChangesOperation = CKFetchNotificationChangesOperation(previousServerChangeToken: serverChangeToken)
@@ -478,15 +479,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             // #### Determine reason for change and act accordingly ####
             
-            if queryNote.queryNotificationReason == CKQueryNotificationReason.RecordCreated{
+            if queryNote.queryNotificationReason == CKQueryNotificationReason.recordCreated{
                 if (!newRecordIDs.contains(queryNote.recordID!)) {
                     newRecordIDs.append(queryNote.recordID!)
                 }
-            }else if queryNote.queryNotificationReason == CKQueryNotificationReason.RecordDeleted{
+            }else if queryNote.queryNotificationReason == CKQueryNotificationReason.recordDeleted{
                 if (!deleteRecordIDs.contains(queryNote.recordID!)) {
                     deleteRecordIDs.append(queryNote.recordID!)
                 }
-            }else if queryNote.queryNotificationReason == CKQueryNotificationReason.RecordUpdated{
+            }else if queryNote.queryNotificationReason == CKQueryNotificationReason.recordUpdated{
                 if (!updateRecordIDs.contains(queryNote.recordID!)) {
                     updateRecordIDs.append(queryNote.recordID!)
                 }
@@ -497,14 +498,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
             if ((error) != nil) {
                 print("failed to fetch notification with \(error)")
-                completionHandler(success: false)
+                completionHandler(false)
                 return
             }
             
             // Exit if the tokens are identitcal 
             if self.previousChangeToken == serverChangeToken {
                 print("Exit from fetchNotificationChangesCompletionBlock because token hasn't changed")
-                completionHandler(success: true)
+                completionHandler(true)
                 return
             }
             
@@ -516,20 +517,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     
                     if ((error) != nil){
                         print("Error in queryMessagesWithIDs: \(error)")
-                        completionHandler(success: false)
+                        completionHandler(false)
                         return
                     }
                     
                     // Save CKRecords to CoreData
-                    self.addPrograms(messages)
-                    completionHandler(success: true)
+                    self.addPrograms(messages!)
+                    completionHandler(true)
                 })
             }
             
             // #### 2. DELETE records ####
             if deleteRecordIDs.count > 0 {
                 self.deletePrograms(deleteRecordIDs)
-                completionHandler(success: true)
+                completionHandler(true)
             }
             
             // #### 3. UPDATE existing records ####
@@ -538,22 +539,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     
                     if ((error) != nil){
                         print("Error in queryMessagesWithIDs: \(error)")
-                        completionHandler(success: false)
+                        completionHandler(false)
                         return
                     }
                     
-                    self.updatePrograms(messages)
-                    completionHandler(success: true)
+                    self.updatePrograms(messages!)
+                    completionHandler(true)
                 })
             }
             
         }
         
-        CKContainer.defaultContainer().addOperation(notificationChangesOperation)
+        CKContainer.default().add(notificationChangesOperation)
     }
     
     
-    func queryMessagesWithIDs(IDs:[CKRecordID], completionHandler: ([CKRecord]!, NSError!) -> Void) -> Void {
+    func queryMessagesWithIDs(_ IDs:[CKRecordID], completionHandler: @escaping ([CKRecord]?, NSError?) -> Void) -> Void {
         
         let fetchRecordsOperation = CKFetchRecordsOperation(recordIDs: IDs)
         
@@ -571,14 +572,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if ((error) != nil){
                 print("completion block error: \(error)")
             }else{
-                newMessages.sortInPlace{$0.creationDate!.compare($1.creationDate!) == NSComparisonResult.OrderedAscending}
+                newMessages.sort{$0.creationDate!.compare($1.creationDate!) == ComparisonResult.orderedAscending}
             }
             
-            dispatch_async(dispatch_get_main_queue(), {completionHandler(newMessages, error)})
+            DispatchQueue.main.async(execute: {completionHandler(newMessages, error as NSError!)})
         }
         
-        let publicDatabase = CKContainer.defaultContainer().publicCloudDatabase
-        publicDatabase.addOperation(fetchRecordsOperation)
+        let publicDatabase = CKContainer.default().publicCloudDatabase
+        publicDatabase.add(fetchRecordsOperation)
         
     }
     
@@ -588,10 +589,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // This is a computed property
     var previousChangeToken:CKServerChangeToken? {
         get {
-            let encodedObjectData = NSUserDefaults.standardUserDefaults().objectForKey("SubscriptionKeys")?.objectForKey("PreviousChangeToken") as? NSData
+            // let subscriptionKeys = (UserDefaults.standard.object(forKey: "SubscriptionKeys"));
+            // let objData = subscriptionKeys.object(forKey: "PreviousChangeToken");
+            //let encodedObjectData = (UserDefaults.standard.object(forKey: "SubscriptionKeys")? as AnyObject).object(forKey: "PreviousChangeToken") as? Data
+            let encodedObjectData = (UserDefaults.standard.object(forKey: "SubscriptionKeys") as! NSDictionary).object(forKey: "PreviousChangeToken") as? Data
             
             if ((encodedObjectData) != nil) {
-                return NSKeyedUnarchiver.unarchiveObjectWithData(encodedObjectData!) as? CKServerChangeToken
+                return NSKeyedUnarchiver.unarchiveObject(with: encodedObjectData!) as? CKServerChangeToken
             }
             
             return nil
@@ -600,7 +604,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if ((newToken) != nil) {
                 print("set new token as \(newToken)")
                 
-                NSUserDefaults.standardUserDefaults().setObject(["PreviousChangeToken": NSKeyedArchiver.archivedDataWithRootObject(newToken!)], forKey: "SubscriptionKeys")
+                UserDefaults.standard.set(["PreviousChangeToken": NSKeyedArchiver.archivedData(withRootObject: newToken!)], forKey: "SubscriptionKeys")
             }
         }
     }
@@ -608,31 +612,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // MARK: - Core Data stack
 
-    lazy var applicationDocumentsDirectory: NSURL = {
+    lazy var applicationDocumentsDirectory: URL = {
         // The directory the application uses to store the Core Data store file. This code uses a directory named "David-Vincent-Hanagan.EventsList" in the application's documents Application Support directory.
-        let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
+        let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         return urls[urls.count-1]
     }()
 
     lazy var managedObjectModel: NSManagedObjectModel = {
         // The managed object model for the application. This property is not optional. It is a fatal error for the application not to be able to find and load its model.
-        let modelURL = NSBundle.mainBundle().URLForResource("EventsList", withExtension: "momd")!
-        return NSManagedObjectModel(contentsOfURL: modelURL)!
+        let modelURL = Bundle.main.url(forResource: "EventsList", withExtension: "momd")!
+        return NSManagedObjectModel(contentsOf: modelURL)!
     }()
 
     lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator = {
         // The persistent store coordinator for the application. This implementation creates and returns a coordinator, having added the store for the application to it. This property is optional since there are legitimate error conditions that could cause the creation of the store to fail.
         // Create the coordinator and store
         let coordinator = NSPersistentStoreCoordinator(managedObjectModel: self.managedObjectModel)
-        let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("SingleViewCoreData.sqlite")
+        let url = self.applicationDocumentsDirectory.appendingPathComponent("SingleViewCoreData.sqlite")
         var failureReason = "There was an error creating or loading the application's saved data."
         do {
-            try coordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: nil)
+            try coordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: url, options: nil)
         } catch {
             // Report any error we got.
             var dict = [String: AnyObject]()
-            dict[NSLocalizedDescriptionKey] = "Failed to initialize the application's saved data"
-            dict[NSLocalizedFailureReasonErrorKey] = failureReason
+            dict[NSLocalizedDescriptionKey] = "Failed to initialize the application's saved data" as AnyObject?
+            dict[NSLocalizedFailureReasonErrorKey] = failureReason as AnyObject?
 
             dict[NSUnderlyingErrorKey] = error as NSError
             let wrappedError = NSError(domain: "YOUR_ERROR_DOMAIN", code: 9999, userInfo: dict)
@@ -648,7 +652,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var managedObjectContext: NSManagedObjectContext = {
         // Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.) This property is optional since there are legitimate error conditions that could cause the creation of the context to fail.
         let coordinator = self.persistentStoreCoordinator
-        var managedObjectContext = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
+        var managedObjectContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         managedObjectContext.persistentStoreCoordinator = coordinator
         return managedObjectContext
     }()

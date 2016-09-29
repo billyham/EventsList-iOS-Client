@@ -13,10 +13,10 @@ import CoreData
 import CloudKit
 
 // A small discrete unit of work
-class MyImageRequest: NSOperation {
+class MyImageRequest: Operation {
     
     var context: NSManagedObjectContext?
-    private var innerContext: NSManagedObjectContext?
+    fileprivate var innerContext: NSManagedObjectContext?
     let imageName: String
     let cacheDir: String?
     
@@ -28,39 +28,39 @@ class MyImageRequest: NSOperation {
     
     override func main() {
         
-        if self.cancelled {
+        if self.isCancelled {
             return
         }
         
         let myRecordID = CKRecordID.init(recordName: self.imageName)
         
-        let publicDatabase = CKContainer.defaultContainer().publicCloudDatabase
-        publicDatabase.fetchRecordWithID(myRecordID, completionHandler: { (ckRecord, error) in
+        let publicDatabase = CKContainer.default().publicCloudDatabase
+        publicDatabase.fetch(withRecordID: myRecordID, completionHandler: { (ckRecord, error) in
             if error != nil{
                 print("Exit because error trying to fetch imageName: \(self.imageName) with error: \(error)")
             }else{
                 
-                let imageAsset = ckRecord?.objectForKey("image") as! CKAsset
+                let imageAsset = ckRecord?.object(forKey: "image") as! CKAsset
                 
-                let imageData = NSData(contentsOfURL: imageAsset.fileURL)
+                let imageData = try? Data(contentsOf: imageAsset.fileURL)
                 if let image = UIImage(data: imageData!){
                     
                     // Save image to cache
                     self.saveImage(image, imageName: self.imageName)
                     
                     // Do this in the main thread...
-                    dispatch_async(dispatch_get_main_queue(), {
-                        NSNotificationCenter.defaultCenter().postNotificationName("newImageInCache", object: nil, userInfo: ["imageName": self.imageName])
+                    DispatchQueue.main.async(execute: {
+                        NotificationCenter.default.post(name: Notification.Name(rawValue: "newImageInCache"), object: nil, userInfo: ["imageName": self.imageName])
                     })
                     
                 }else{
-                    print("Exit because failed to generate UIImage with data from CloudKit, with file: \(imageAsset.fileURL.absoluteString.stringByAppendingString(".png"))")
+                    print("Exit because failed to generate UIImage with data from CloudKit, with file: \(imageAsset.fileURL.absoluteString + ".png")")
                 }
             }
         })
     }
     
-    func saveImage(image: UIImage, imageName: String) {
+    func saveImage(_ image: UIImage, imageName: String) {
         
         if self.cacheDir == nil {
             print("MyImageSave has nil for cacheDir")
@@ -76,19 +76,19 @@ class MyImageRequest: NSOperation {
         
         let path = self.cacheDir! + "/" + imageName
         
-        let ok = NSFileManager.defaultManager().createFileAtPath(path, contents: nil, attributes: nil)
+        let ok = FileManager.default.createFile(atPath: path, contents: nil, attributes: nil)
         
         if ok == false {
             print("Exit because Error creating image file")
             return
         }
         
-        let cacheDir = NSURL.init(fileURLWithPath: self.cacheDir!)
-        let imagePath: NSURL = cacheDir.URLByAppendingPathComponent(imageName)
+        let cacheDir = URL.init(fileURLWithPath: self.cacheDir!)
+        let imagePath: URL = cacheDir.appendingPathComponent(imageName)
         
         do {
-            let myFileHandle = try NSFileHandle.init(forWritingToURL: imagePath)
-            myFileHandle.writeData(PNGImage!)
+            let myFileHandle = try FileHandle.init(forWritingTo: imagePath)
+            myFileHandle.write(PNGImage!)
             myFileHandle.closeFile()
             print("Saved image to cache")
             return
@@ -164,11 +164,11 @@ class MyImageRequest: NSOperation {
 
 class NetworkController: NSObject {
 
-    let queue = NSOperationQueue()
+    let queue = OperationQueue()
     var myContext: NSManagedObjectContext?
     
-    lazy var imageQueue: NSOperationQueue = {
-       var queue = NSOperationQueue()
+    lazy var imageQueue: OperationQueue = {
+       var queue = OperationQueue()
         queue.name = "Image queue"
         queue.maxConcurrentOperationCount = 1
         return queue
@@ -182,7 +182,7 @@ class NetworkController: NSObject {
     
     // MARK: - Image Cache
     
-    internal func requestImageFromCloud(imageName: String, completion: (Bool -> Void)) {
+    internal func requestImageFromCloud(_ imageName: String, completion: ((Bool) -> Void)) {
         
         // ####
         // Get images from CloudKit
@@ -205,7 +205,7 @@ class NetworkController: NSObject {
     
     lazy var applicationDocumentsCacheDirectory: String? = {
         
-        let paths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        let paths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.cachesDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
         if paths.count > 0 {
             let basePath = paths[0]
             return basePath
@@ -224,7 +224,7 @@ class NetworkController: NSObject {
 //        
 //    }
     
-    func requestData(completion: (Void) -> Bool) {
+    func requestData(_ completion: (Void) -> Bool) {
         
     }
     

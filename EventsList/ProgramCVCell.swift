@@ -21,7 +21,7 @@ class ProgramCVCell: UICollectionViewCell {
         // Initialization code
     }
     
-    internal func assignValues(title: String, image440: String?){
+    internal func assignValues(_ title: String, image440: String?){
         if titleLabel != nil{
             titleLabel!.text = title
         }

@@ -9,13 +9,33 @@
 import UIKit
 import CoreData
 import CloudKit
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
 
 
 class MainIPhoneCVC: UICollectionViewController {
     
-    private let reuseIdentifier = "Cell"
-    private var arrayOfEvents = [ProgramModel]()
-    private var webView: webVC?
+    fileprivate let reuseIdentifier = "Cell"
+    fileprivate var arrayOfEvents = [ProgramModel]()
+    fileprivate var webView: webVC?
     
     internal var myContext: NSManagedObjectContext?
     internal var myNetworkController: NetworkController?
@@ -29,12 +49,12 @@ class MainIPhoneCVC: UICollectionViewController {
         // self.clearsSelectionOnViewWillAppear = false
 
         // Register for notifications
-        let defaultNotificationCenter = NSNotificationCenter.defaultCenter()
-        defaultNotificationCenter.addObserver(self, selector: #selector(self.newImageInCache), name: "newImageInCache", object: nil)
+        let defaultNotificationCenter = NotificationCenter.default
+        defaultNotificationCenter.addObserver(self, selector: #selector(self.newImageInCache), name: NSNotification.Name(rawValue: "newImageInCache"), object: nil)
         
         // Register cell classes
 //        self.collectionView!.registerClass(ProgramCVCell.self, forCellWithReuseIdentifier: reuseIdentifier)
-        self.collectionView!.registerNib(UINib.init(nibName: "ProgramCVCell", bundle: nil), forCellWithReuseIdentifier: "Cell")
+        self.collectionView!.register(UINib.init(nibName: "ProgramCVCell", bundle: nil), forCellWithReuseIdentifier: "Cell")
 
         // Initially populate array with content and present collection view
         self.updateCollectionView(type: "Add", arrayOfChanged: nil)
@@ -43,11 +63,11 @@ class MainIPhoneCVC: UICollectionViewController {
     
     // MARK: - Public methods for changing content of collection view
     
-    internal func updateCollectionView(type type: String, arrayOfChanged: [CKRecord]?) {
+    internal func updateCollectionView(type: String, arrayOfChanged: [CKRecord]?) {
         
         // Get an updated array of Programs objects
         
-        let request = NSFetchRequest.init(entityName: "Program")
+        let request = NSFetchRequest<NSFetchRequestResult>.init(entityName: "Program")
         request.predicate = NSPredicate.init(format: "hideFromPublic == nil OR hideFromPublic == 0", argumentArray: nil)
         request.sortDescriptors = [NSSortDescriptor.init(key: "title", ascending: true)]
         
@@ -55,17 +75,20 @@ class MainIPhoneCVC: UICollectionViewController {
         
         //execute the fetch and add to a new array
         do {
-            let arrayResult = try myContext?.executeFetchRequest(request)
+            let arrayResult = try myContext?.fetch(request)
             
-            for object in arrayResult!{
-                let newObject = object as! Program
-                arrayOfNewEvents.append(ProgramModel.init(
-                    title: object.title!!,
-                    ckRecordName: newObject.ckRecordName!,
-                    image440: newObject.image440Name,
-                    video: newObject.video
+            if arrayResult != nil{
+                for object in arrayResult!{
+                    let newObject = object as! Program
+                    arrayOfNewEvents.append(ProgramModel.init(
+                        title: (object as AnyObject).title!!,
+                        ckRecordName: newObject.ckRecordName!,
+                        image440: newObject.image440Name,
+                        video: newObject.video
                     ))
+                }
             }
+            
             
         }catch let error as NSError{
             print("Failed to execute CoreData fetch: \(error)")
@@ -92,14 +115,14 @@ class MainIPhoneCVC: UICollectionViewController {
 //                    
 //                })!
                 
-                var arrayOfIndexPaths = [NSIndexPath]()
+                var arrayOfIndexPaths = [IndexPath]()
                 
                 for record in arrayOfChanged! {
                     
                     for i in 0..<arrayOfNewEvents.count {
                         
                         if record.recordID.recordName == arrayOfNewEvents[i].ckRecordName {
-                            arrayOfIndexPaths.append(NSIndexPath.init(forItem: i, inSection: 0))
+                            arrayOfIndexPaths.append(IndexPath.init(item: i, section: 0))
                             break
                         }
                     }
@@ -107,8 +130,8 @@ class MainIPhoneCVC: UICollectionViewController {
                 
                 if arrayOfIndexPaths.count > 0 {
                     self.arrayOfEvents = arrayOfNewEvents
-                    dispatch_async(dispatch_get_main_queue(), {
-                        self.collectionView!.insertItemsAtIndexPaths(arrayOfIndexPaths)
+                    DispatchQueue.main.async(execute: {
+                        self.collectionView!.insertItems(at: arrayOfIndexPaths)
                     })
                 }
                 
@@ -121,15 +144,15 @@ class MainIPhoneCVC: UICollectionViewController {
             
             if arrayOfChanged != nil {
                 
-                var indexPathOld = NSIndexPath.init()
-                var indexPathNew = NSIndexPath.init()
+                var indexPathOld = IndexPath.init()
+                var indexPathNew = IndexPath.init()
                 
                 for record in arrayOfChanged! {
                     
                     for i in 0..<arrayOfNewEvents.count {
                         
                         if record.recordID.recordName == arrayOfNewEvents[i].ckRecordName {
-                            indexPathNew = NSIndexPath.init(forItem: i, inSection: 0)
+                            indexPathNew = IndexPath.init(item: i, section: 0)
                             break
                         }
                     }
@@ -137,15 +160,15 @@ class MainIPhoneCVC: UICollectionViewController {
                     for i in 0..<self.arrayOfEvents.count {
                         
                         if record.recordID.recordName == self.arrayOfEvents[i].ckRecordName {
-                            indexPathOld = NSIndexPath.init(forItem: i, inSection: 0)
+                            indexPathOld = IndexPath.init(item: i, section: 0)
                             break
                         }
                     }
                     
                     self.arrayOfEvents = arrayOfNewEvents
-                    dispatch_async(dispatch_get_main_queue(), {
-                        self.collectionView?.moveItemAtIndexPath(indexPathOld, toIndexPath: indexPathNew)
-                        self.collectionView?.reloadItemsAtIndexPaths([indexPathNew])
+                    DispatchQueue.main.async(execute: {
+                        self.collectionView?.moveItem(at: indexPathOld, to: indexPathNew)
+                        self.collectionView?.reloadItems(at: [indexPathNew])
                     })
                 }
                 
@@ -162,22 +185,25 @@ class MainIPhoneCVC: UICollectionViewController {
             self.arrayOfEvents = []
             
             do {
-                let arrayResult = try myContext?.executeFetchRequest(request)
+                let arrayResult = try myContext?.fetch(request)
                 
-                for object in arrayResult!{
-                    if object.title != nil{
-                        let newObject = object as! Program
-                        self.arrayOfEvents.append(ProgramModel.init(
-                            title: object.title!!,
-                            ckRecordName: newObject.ckRecordName!,
-                            image440: newObject.image440Name,
-                            video: newObject.video
+                if arrayResult != nil{
+                    for object in arrayResult!{
+                        if (object as AnyObject).title != nil{
+                            let newObject = object as! Program
+                            self.arrayOfEvents.append(ProgramModel.init(
+                                title: (object as AnyObject).title!!,
+                                ckRecordName: newObject.ckRecordName!,
+                                image440: newObject.image440Name,
+                                video: newObject.video
                             ))
+                        }
                     }
+                    DispatchQueue.main.async(execute: {
+                        self.collectionView?.reloadData()
+                    })
                 }
-                dispatch_async(dispatch_get_main_queue(), {
-                    self.collectionView?.reloadData()
-                })
+                
                 
             }catch let error as NSError{
                 print("Failed to execute CoreData fetch: \(error)")
@@ -185,11 +211,11 @@ class MainIPhoneCVC: UICollectionViewController {
         }
     }
 
-    internal func deleteFromCollectionView(arrayOfChanged:[CKRecordID]?) -> Void {
+    internal func deleteFromCollectionView(_ arrayOfChanged:[CKRecordID]?) -> Void {
         
         // Get an updated array of Programs objects
         
-        let request = NSFetchRequest.init(entityName: "Program")
+        let request = NSFetchRequest<NSFetchRequestResult>.init(entityName: "Program")
         request.predicate = NSPredicate.init(format: "hideFromPublic == nil OR hideFromPublic == 0", argumentArray: nil)
         request.sortDescriptors = [NSSortDescriptor.init(key: "title", ascending: true)]
         
@@ -197,12 +223,12 @@ class MainIPhoneCVC: UICollectionViewController {
         
         //execute the fetch and add to a new array
         do {
-            let arrayResult = try myContext?.executeFetchRequest(request)
+            let arrayResult = try myContext?.fetch(request)
             
             for object in arrayResult!{
                 let newObject = object as! Program
                 arrayOfNewEvents.append(ProgramModel.init(
-                    title: object.title!!,
+                    title: (object as AnyObject).title!!,
                     ckRecordName: newObject.ckRecordName!,
                     image440: newObject.image440Name,
                     video: newObject.video
@@ -215,14 +241,14 @@ class MainIPhoneCVC: UICollectionViewController {
         
         if arrayOfChanged != nil {
             
-            var arrayOfIndexPaths = [NSIndexPath]()
+            var arrayOfIndexPaths = [IndexPath]()
             
             for recordID in arrayOfChanged! {
                 
                 for i in 0..<self.arrayOfEvents.count {
                     
                     if recordID.recordName == self.arrayOfEvents[i].ckRecordName {
-                        arrayOfIndexPaths.append(NSIndexPath.init(forItem: i, inSection: 0))
+                        arrayOfIndexPaths.append(IndexPath.init(item: i, section: 0))
                         break
                     }
                 }
@@ -230,8 +256,8 @@ class MainIPhoneCVC: UICollectionViewController {
             
             if arrayOfIndexPaths.count > 0 {
                 self.arrayOfEvents = arrayOfNewEvents
-                dispatch_async(dispatch_get_main_queue(), {
-                    self.collectionView!.deleteItemsAtIndexPaths(arrayOfIndexPaths)
+                DispatchQueue.main.async(execute: {
+                    self.collectionView!.deleteItems(at: arrayOfIndexPaths)
                 })
                 
             }
@@ -241,7 +267,7 @@ class MainIPhoneCVC: UICollectionViewController {
             // #### Wholesale array replacement ####
             
             self.arrayOfEvents = arrayOfNewEvents
-            dispatch_async(dispatch_get_main_queue(), {
+            DispatchQueue.main.async(execute: {
                 self.collectionView?.reloadData()
             })
         }
@@ -250,16 +276,16 @@ class MainIPhoneCVC: UICollectionViewController {
     
     // MARK: - Responding to Changes in image cache
     
-    func newImageInCache(note: NSNotification) {
+    func newImageInCache(_ note: Notification) {
         
-        if note.userInfo != nil {
-            let userDictionary = note.userInfo
+        if (note as NSNotification).userInfo != nil {
+            let userDictionary = (note as NSNotification).userInfo
             let imageName = userDictionary!["imageName"] as! String
             print("notification fires, this is the userInfo: \(userDictionary!["imageName"])")
             
             for index in 0..<self.arrayOfEvents.count {
                 if self.arrayOfEvents[index].image440 == imageName {
-                    self.collectionView?.reloadItemsAtIndexPaths([NSIndexPath.init(forRow: index, inSection: 0)])
+                    self.collectionView?.reloadItems(at: [IndexPath.init(row: index, section: 0)])
                     print("did reload item at index: \(index)")
                     break
                 }
@@ -273,7 +299,7 @@ class MainIPhoneCVC: UICollectionViewController {
     
     // MARK: - Responding to orientation changes
     
-    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         
         // Force a layout refresh
         self.collectionView?.collectionViewLayout.invalidateLayout()
@@ -286,18 +312,18 @@ class MainIPhoneCVC: UICollectionViewController {
         }
         
         // OK, sure, this. Un huh
-        coordinator.animateAlongsideTransition(nil) { (context) in
+        coordinator.animate(alongsideTransition: nil) { (context) in
             
-            if self.collectionView?.numberOfSections() > 0 {
-                if self.collectionView?.numberOfItemsInSection(0) > 0{
+            if self.collectionView?.numberOfSections > 0 {
+                if self.collectionView?.numberOfItems(inSection: 0) > 0{
                     
                     // Scroll to top
-                    self.collectionView!.scrollToItemAtIndexPath(NSIndexPath.init(forRow: 0, inSection: 0), atScrollPosition: UICollectionViewScrollPosition.Top, animated: false)
+                    self.collectionView!.scrollToItem(at: IndexPath.init(row: 0, section: 0), at: UICollectionViewScrollPosition.top, animated: false)
                 }
             }
         }
         
-        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        super.viewWillTransition(to: size, with: coordinator)
     }
     
 //    override func viewWillLayoutSubviews() {
@@ -309,7 +335,7 @@ class MainIPhoneCVC: UICollectionViewController {
 //    }
     
     // MARK: - Retrieve image locally 
-    func retrieveImage(imageName: String) -> UIImage? {
+    func retrieveImage(_ imageName: String) -> UIImage? {
         
         let cacheDirAsString = self.applicationDocumentsCacheDirectory
         if cacheDirAsString == nil{
@@ -318,22 +344,22 @@ class MainIPhoneCVC: UICollectionViewController {
         }
         
         // Get all files in the cache directory
-        let fm = NSFileManager.defaultManager()
+        let fm = FileManager.default
         
         do {
-            let fileList = try fm.contentsOfDirectoryAtPath(cacheDirAsString!)
+            let fileList = try fm.contentsOfDirectory(atPath: cacheDirAsString!)
             
             // Return a cached image with a matching name
             for stringThing in fileList {
                 
                 if stringThing == imageName {
                     
-                    let cacheDir = NSURL.init(fileURLWithPath: cacheDirAsString!)
+                    let cacheDir = URL.init(fileURLWithPath: cacheDirAsString!)
                     
-                    let imagePath: NSURL = cacheDir.URLByAppendingPathComponent(imageName)
+                    let imagePath: URL = cacheDir.appendingPathComponent(imageName)
                     
                     do {
-                        let fileHandle = try NSFileHandle.init(forReadingFromURL:imagePath)
+                        let fileHandle = try FileHandle.init(forReadingFrom:imagePath)
                         
                         let imageAsImage = UIImage.init(data: (fileHandle.readDataToEndOfFile()), scale: 1.0)
                         if imageAsImage != nil {
@@ -362,7 +388,7 @@ class MainIPhoneCVC: UICollectionViewController {
     
     lazy var applicationDocumentsCacheDirectory: String? = {
     
-        let paths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        let paths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.cachesDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
         if paths.count > 0 {
             let basePath = paths[0]
             return basePath
@@ -374,9 +400,9 @@ class MainIPhoneCVC: UICollectionViewController {
     
     // MARK: - Flow Layout Delegate methods
     
-    func collectionView(collectionView: UICollectionView,
+    func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
-                               sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize{
+                               sizeForItemAtIndexPath indexPath: IndexPath) -> CGSize{
     
         if self.collectionView!.frame.size.width < 400 {
             return CGSize.init(width: self.collectionView!.frame.size.width, height: 65.0)
@@ -390,23 +416,23 @@ class MainIPhoneCVC: UICollectionViewController {
 
     // MARK: - UICollectionViewDataSource
 
-    override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
         
         return 1
     }
 
 
-    override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
         return arrayOfEvents.count        
     }
 
-    override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! ProgramCVCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ProgramCVCell
         cell.contentView.clipsToBounds = true
         
-        let modelObject = self.arrayOfEvents[indexPath.row]
+        let modelObject = self.arrayOfEvents[(indexPath as NSIndexPath).row]
         cell.assignValues(modelObject.title, image440: modelObject.image440)
         
         // For re-used cells, remove the image if it doesn't match the
@@ -453,20 +479,20 @@ class MainIPhoneCVC: UICollectionViewController {
 
     // MARK: - UICollectionViewDelegate
 
-    override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
         // Action depends on current orientation...
         
-        let thisOrientation = UIDevice.currentDevice().orientation
-        if thisOrientation == UIDeviceOrientation.Portrait{
-            self.performSegueWithIdentifier("showDetail", sender: self.navigationController)
+        let thisOrientation = UIDevice.current.orientation
+        if thisOrientation == UIDeviceOrientation.portrait{
+            self.performSegue(withIdentifier: "showDetail", sender: self.navigationController)
             
         }else{
             let webView = webVC.init(nibName: "webVC", bundle: nil)
-            webView.video = self.arrayOfEvents[indexPath.row].video
+            webView.video = self.arrayOfEvents[(indexPath as NSIndexPath).row].video
             self.webView = webView
-            self.modalPresentationStyle = UIModalPresentationStyle.FormSheet
-            self.presentViewController(self.webView!, animated: true) {
+            self.modalPresentationStyle = UIModalPresentationStyle.formSheet
+            self.present(self.webView!, animated: true) {
                 
             }
         }
